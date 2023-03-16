@@ -5,5 +5,5 @@ first-lba: 2048
 last-lba: 16777182
 sector-size: 512
 
-VLGOS1 : start=        2048, size=         128, uuid=820AE6FF-536C-D34B-AD24-9F09D0CE76D5, name="VLGBL"
-VLGOS2 : start=        4096, size=    16771072, uuid=3DADE943-FFB1-CE49-999E-B20FF539B2EE
+VLGOS1 : start=        4096, size=    16771072, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4
+VLGOS2 : start=        2048, size=         128, type=21686148-6449-6E6F-744E-656564454649, name="VLGBL"

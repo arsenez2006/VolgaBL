@@ -133,7 +133,8 @@ __start:
     mov al, '6'
     jc near .fail
 
-
+    ; Far jump to SSL
+    jmp 0x0800:0x0000
 
 .halt:
     hlt

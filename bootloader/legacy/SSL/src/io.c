@@ -151,7 +151,7 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
         uintptr_t           ptr_type;
     } arg;
 
-    if (!write)
+    if (!buffer)
         write = _buffer_null;
 
     while (*format) {

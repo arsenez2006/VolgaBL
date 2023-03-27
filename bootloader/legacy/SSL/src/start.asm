@@ -3,6 +3,8 @@ bits 16
 
 global __start
 global _drive_number
+global __heap
+global __heap_size
 
 extern _ssl_entry
 extern _enter_unreal_mode
@@ -14,9 +16,21 @@ align 16
 .top:
     resb 1024 * 4
 .bottom:
+
+; Allocate heap
+__heap:
+align 16
+.start:
+    resb 1024 * 4
+.end:
+
 ; Drive number
 _drive_number:
     resb 1
+
+section .data
+__heap_size:
+    dw __heap.end - __heap.start
 
 section .text
 __start:

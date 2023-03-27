@@ -3,6 +3,7 @@
 #include <bl/string.h>
 #include <bl/io.h>
 #include <bl/utils.h>
+#include <bl/mem.h>
 
 static int print_error(const char* error_str) {
     return printf("VLGBL Error: %s.", error_str);
@@ -13,6 +14,8 @@ static GDTR48 gdtr_pm;
 static GDT_entry gdt_pm[3];
 
 word_t ssl_entry() {
+    //printf("Loading VLGBL...\n");
+
     /* Null descriptor */
     set_GDT_entry(&gdt_pm[0], 0, 0, 0, 0, 0, 0);
 
@@ -42,6 +45,20 @@ word_t ssl_entry() {
 
     /* Enter Unreal mode */
     enter_unreal(2 * sizeof(GDT_entry));
+
+    /* Initialize allocator */
+    if(!mem_init()) {
+        print_error("Failed to initialize allocator");
+    }
+
+    void* block1 = malloc(512);
+    void* block2 = malloc(2048);
+    void* block3 = malloc(512);
+    free(block2);
+    free(block1);
+    free(block3);
+
+    mem_dump();
 
     return 0;
 }

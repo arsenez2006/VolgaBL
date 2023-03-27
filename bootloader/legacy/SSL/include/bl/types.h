@@ -33,9 +33,9 @@ typedef enum { false, true } bool;
 
 typedef struct _GPT_header {
     byte_t magic[8];
-    byte_t revision[4];
-    byte_t hdr_size[4];
-    byte_t crc32[4];
+    dword_t revision;
+    dword_t hdr_size;
+    dword_t crc32;
     byte_t rsv0[4];
     byte_t hdr_lba[8];
     byte_t alt_hdr_lba[8];
@@ -43,9 +43,9 @@ typedef struct _GPT_header {
     byte_t last_usable[8];
     byte_t guid[16];
     byte_t partition_array[8];
-    byte_t entries_count[4];
-    byte_t entry_size[4];
-    byte_t partition_array_crc32[4];
+    dword_t entries_count;
+    dword_t entry_size;
+    dword_t partition_array_crc32;
 } GPT_header;
 
 typedef enum {

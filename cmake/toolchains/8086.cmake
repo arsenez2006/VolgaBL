@@ -19,4 +19,4 @@ set(CMAKE_C_COMPILER_WORKS TRUE)
 
 # Linker
 find_program(CMAKE_LINKER smlrl REQUIRED)
-set(CMAKE_EXE_LINKER_FLAGS "-flat16 -origin 0x0000")
+set(CMAKE_EXE_LINKER_FLAGS "-flat16 -origin 0x0000 -nobss")

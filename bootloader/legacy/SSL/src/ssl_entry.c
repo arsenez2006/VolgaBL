@@ -13,6 +13,11 @@ static int print_error(const char* error_str) {
 static GDTR48 gdtr_pm;
 static GDT_entry gdt_pm[3];
 
+static byte_t kernel_partition_type[] = 
+{ 0xAF, 0x3D, 0xC6, 0x0F, 0x83, 0x84, 0x72, 0x47, 0x8E, 0x79, 0x3D, 0x69, 0xD8, 0x47, 0x7D, 0xE4 };
+static byte_t kernel_partition_name[] = 
+{'V', '\0', 'L', '\0', 'G', '\0', 'K', '\0', 'R', '\0', 'N', '\0', 'L', '\0'};
+
 word_t ssl_entry() {
     /* Print loading message*/
     printf("Loading VLGBL...\n");
@@ -107,7 +112,9 @@ word_t ssl_entry() {
 
     /* Save some information from GPT header */
     word_t partition_entry_size;
+    word_t partition_entry_count;
     assign_dword_to_word(partition_entry_size, gpt_hdr->entry_size);
+    assign_dword_to_word(partition_entry_count, gpt_hdr->entries_count);
     byte_t disk_guid[16];
     memcpy(disk_guid, gpt_hdr->guid, 16);
 
@@ -136,7 +143,23 @@ word_t ssl_entry() {
         print_error("Failed to read partition table");
         return 1;
     }
-    
+
+    /* Find kernel partition */
+    bool found = false;
+    while(partition_entry_count--) {
+        if (
+            memcmp(partition_entry->type, kernel_partition_type, sizeof(kernel_partition_type)) == 0 &&
+            memcmp(((char*)partition_entry) + sizeof(GPT_partition_entry), kernel_partition_name, sizeof(kernel_partition_name)) == 0
+            ) {
+            found = true;
+            break;
+        }
+        partition_entry = (GPT_partition_entry*)(((char*)partition_entry) + partition_entry_size);
+    }
+    if (!found) {
+        print_error("Failed to find kernel partiotion");
+        return 1;
+    }
 
     mem_dump();
 

@@ -37,16 +37,24 @@ typedef struct _GPT_header {
     dword_t hdr_size;
     dword_t crc32;
     byte_t rsv0[4];
-    byte_t hdr_lba[8];
-    byte_t alt_hdr_lba[8];
-    byte_t first_usable[8];
-    byte_t last_usable[8];
+    qword_t hdr_lba;
+    qword_t alt_hdr_lba;
+    qword_t first_usable;
+    qword_t last_usable;
     byte_t guid[16];
-    byte_t partition_array[8];
+    qword_t partition_array;
     dword_t entries_count;
     dword_t entry_size;
     dword_t partition_array_crc32;
 } GPT_header;
+
+typedef struct _GPT_partition_entry {
+    byte_t type[16];
+    byte_t uuid[16];
+    qword_t start_lba;
+    qword_t end_lba;
+    qword_t attrs;
+} GPT_partition_entry;
 
 typedef enum {
     GDT_ACCESS_PRESENT      = (1 << 7),

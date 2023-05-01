@@ -56,6 +56,7 @@ _bios_get_drive_parameteres:
     mov dl, byte [_drive_number]
     mov si, word [bp + 4]
     int 0x13
+
     jnc short .success
 
 .fail:

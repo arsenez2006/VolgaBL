@@ -51,6 +51,7 @@ __start:
     mov ah, 0x48
     mov dl, byte [drive_number]
     mov si, (0x8000 - 0x7C00)
+    mov word [es:0x00], 0x1E
     int 0x13
     mov al, '3'
     jc near .fail

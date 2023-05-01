@@ -13,12 +13,10 @@ void set_GDTR48(GDTR48 *gdtr, const void *entries, size_t size) {
     *(word_t*)&gdtr->data[0] = (word_t)(size - 1);
 
     dword_t segment;
-    segment.datal = get_ds() << 4;
-    segment.datah = 0;
+    assign_word_to_dword(segment, get_ds() << 4);
 
     dword_t offset;
-    offset.datal = (uintptr_t)entries;
-    offset.datah = 0;
+    assign_word_to_dword(offset, (uintptr_t)entries);
 
     add_dwords(segment, offset, gdtr->data[2]);
 }

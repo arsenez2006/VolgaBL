@@ -8,28 +8,18 @@ typedef struct _DAP {
     word_t sectors;
     word_t offset;
     word_t segment;
-    word_t lba0;
-    word_t lba1;
-    word_t lba2;
-    word_t lba3;
+    qword_t lba;
 } DAP;
 
 typedef struct _drive_parameteres {
     word_t size;
     word_t flags;
-    word_t cylindersl;
-    word_t cylindersh;
-    word_t headsl;
-    word_t headsh;
-    word_t sectorsl;
-    word_t sectorsh;
-    word_t count_of_sectors0;
-    word_t count_of_sectors1;
-    word_t count_of_sectors2;
-    word_t count_of_sectors3;
+    dword_t cylinders;
+    dword_t heads;
+    dword_t sectors;
+    qword_t count_of_sectors;
     word_t sector_size;
-    word_t EDDl;
-    word_t EDDh;
+    dword_t EDD;
 } drive_parameteres;
 
 extern void bios_putch(byte_t);

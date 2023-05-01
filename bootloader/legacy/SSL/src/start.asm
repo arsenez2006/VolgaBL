@@ -21,7 +21,7 @@ align 16
 __heap:
 align 16
 .start:
-    resb 1024 * 4
+    resb 1024 * 32
 .end:
 
 ; Drive number

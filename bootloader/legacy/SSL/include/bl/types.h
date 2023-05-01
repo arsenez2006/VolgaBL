@@ -31,6 +31,15 @@ typedef struct _qword_t {
 typedef enum { false, true } bool;
 #endif
 
+typedef struct _memory_map_entry {
+    struct _memory_map_entry* next;
+    struct _memory_map_entry* prev;
+    qword_t base;
+    qword_t limit;
+    dword_t type;
+    dword_t ACPI;
+} memory_map_entry;
+
 typedef struct _GPT_header {
     byte_t magic[8];
     dword_t revision;

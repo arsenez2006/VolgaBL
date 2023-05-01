@@ -24,3 +24,11 @@ void* memcpy(void *dest, const void *src, size_t count) {
     }
     return dest;
 }
+
+void* memset(void* ptr, int val, size_t count) {
+    byte_t* data = (byte_t*)ptr;
+    while(count--) {
+        *data++ = (byte_t)val;
+    }
+    return ptr;
+}

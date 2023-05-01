@@ -61,6 +61,36 @@ word_t ssl_entry() {
         return 1;
     }
 
+    /* Get memory map */
+    memory_map_entry* mem_map;
+    if ((mem_map = malloc(sizeof(memory_map_entry))) == NULL) {
+        print_error("Failed to get memory map");
+        return 1;
+    }
+    memset(mem_map, 0, sizeof(memory_map_entry));
+    dword_t mem_map_offset;
+    zero_dword(mem_map_offset);
+    do {
+        if(!bios_get_e820(&mem_map_offset, 24, &mem_map->base)) {
+            print_error("Failed to get memory map");
+            return 1;
+        }
+        if (!dword_is_zero(mem_map_offset)) {
+            if((mem_map->next = malloc(sizeof(memory_map_entry))) == NULL) {
+                print_error("Failed to get memory map");
+                return 1;
+            }
+            memset(mem_map->next, 0, sizeof(memory_map_entry));
+            mem_map->next->prev = mem_map;
+            mem_map = mem_map->next;
+        }
+    } while(!dword_is_zero(mem_map_offset));
+    while (mem_map->prev) {
+        mem_map = mem_map->prev;
+    }
+
+    dump_mem_map(mem_map);
+
     /* Check drive logical sector size */
     drive_parameteres drive_params;
     drive_params.size = sizeof(drive_parameteres);
@@ -161,7 +191,7 @@ word_t ssl_entry() {
         return 1;
     }
 
-    mem_dump();
+    //mem_dump();
 
     return 0;
 }

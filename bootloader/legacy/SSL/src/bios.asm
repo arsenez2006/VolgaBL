@@ -3,6 +3,7 @@ bits 16
 global _bios_putch
 global _bios_read_drive
 global _bios_get_drive_parameteres
+global _bios_get_e820
 
 section .text
 _bios_putch:
@@ -66,6 +67,38 @@ _bios_get_drive_parameteres:
     mov ax, 1
 .ret:
     pop dx
+    pop si
+    mov sp, bp
+    pop bp
+    ret
+
+_bios_get_e820:
+    push bp
+    mov bp, sp
+    push si
+    push ebx
+    push ecx
+    push edx
+
+    mov eax, 0xE820
+    mov edx, 0x534D4150
+    mov si, word [bp + 4]
+    mov ebx, dword [si]
+    movzx ecx, word [bp + 6]
+    mov di, [bp + 8]
+
+    int 0x15
+    
+    mov dword [si], ebx
+    cmp eax, 0x534D4150
+    mov ax, 0
+    jne short .ret
+    mov ax, 1
+    
+.ret:
+    pop edx
+    pop ecx
+    pop ebx
     pop si
     mov sp, bp
     pop bp

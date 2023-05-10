@@ -11,6 +11,8 @@ global __sub_dwords
 global __mul_dwords
 global __div_dwords
 global __mod_dwords
+global __shl_dword
+global __shr_dword
 
 section .bss
 crc32table:
@@ -230,6 +232,48 @@ __mod_dwords:
     pop si
     pop edx
     pop eax
+    mov sp, bp
+    pop bp
+    ret
+
+__shl_dword:
+    push bp
+    mov bp, sp
+    push si
+    push eax
+    push cx
+
+    mov eax, dword [bp + 4]
+    mov cl, byte [bp + 8]
+    shl eax, cl
+    mov si, word [bp + 10]
+    
+    mov dword [si], eax
+    
+    pop cx
+    pop eax
+    pop si
+    mov sp, bp
+    pop bp
+    ret
+
+__shr_dword:
+    push bp
+    mov bp, sp
+    push si
+    push eax
+    push cx
+
+    mov eax, dword [bp + 4]
+    mov cl, byte [bp + 8]
+    shr eax, cl
+    mov si, word [bp + 10]
+    
+    mov dword [si], eax
+    
+    pop cx
+    pop eax
+    pop si
     mov sp, bp
     pop bp
     ret

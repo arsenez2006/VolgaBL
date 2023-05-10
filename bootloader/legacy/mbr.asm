@@ -12,7 +12,7 @@ __start:
 .cs:
     mov ax, 0x07C0
     mov ds, ax
-    mov ax, 0x0800
+    mov ax, 0x7000
     mov es, ax
     mov ax, 0x0050
     mov ss, ax
@@ -126,7 +126,7 @@ __start:
     jc near .fail
 
     ; Far jump to SSL
-    jmp 0x0800:0x0000
+    jmp 0x7000:0x0000
 
 .halt:
     hlt
@@ -192,6 +192,6 @@ DAP:
 .rsv:       db 0x00
 .sectors:   dw 0x0001
 .offset:    dw 0x0000
-.segment:   dw 0x0800
+.segment:   dw 0x7000
 .lba_low:   dd 0x00000001
 .lba_high:  dd 0x00000000

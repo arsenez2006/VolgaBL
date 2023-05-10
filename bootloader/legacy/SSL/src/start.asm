@@ -36,7 +36,7 @@ section .text
 __start:
     ; Initialize segments
     cli
-    mov ax, 0x0800
+    mov ax, cs
     mov ds, ax
     mov es, ax
     mov ss, ax
@@ -46,7 +46,7 @@ __start:
     mov byte [_drive_number], dl
 
     sti
-
+    
     ; Call C code
     call _ssl_entry
 

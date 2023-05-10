@@ -14,7 +14,8 @@ void set_GDTR48(GDTR48 *gdtr, const void *entries, size_t size) {
     *(word_t*)&gdtr->data[0] = (word_t)(size - 1);
 
     dword_t segment;
-    assign_word_to_dword(segment, get_ds() << 4);
+    assign_word_to_dword(segment, get_ds());
+    shl_dword(segment, 4, segment);
 
     dword_t offset;
     assign_word_to_dword(offset, (uintptr_t)entries);

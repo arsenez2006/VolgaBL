@@ -17,6 +17,8 @@ extern void _sub_dwords(dword_t, dword_t, dword_t*);
 extern void _mul_dwords(dword_t, dword_t, dword_t*);
 extern void _div_dwords(dword_t, dword_t, dword_t*);
 extern void _mod_dwords(dword_t, dword_t, dword_t*);
+extern void _shl_dword(dword_t, word_t, dword_t*);
+extern void _shr_dword(dword_t, word_t, dword_t*);
 
 extern void _add_qwords(qword_t, qword_t, qword_t*);
 
@@ -30,6 +32,8 @@ extern void _add_qwords(qword_t, qword_t, qword_t*);
 #define mul_dwords(a, b, ret)               _mul_dwords(a, b, (dword_t*)&ret)
 #define div_dwords(a, b, ret)               _div_dwords(a, b, (dword_t*)&ret)
 #define mod_dwords(a, b, ret)               _mod_dwords(a, b, (dword_t*)&ret)
+#define shl_dword(dword, num, ret)          _shl_dword(dword, num, (dword_t*)&ret)
+#define shr_dword(dword, num, ret)          _shr_dword(dword, num, (dword_t*)&ret)
 #else
 #define dword_is_zero(a)                    (a == 0)
 #define zero_dword(a)                       a = 0
@@ -40,6 +44,8 @@ extern void _add_qwords(qword_t, qword_t, qword_t*);
 #define mul_dwords(a, b, ret)               *(dword_t*)&ret = (dword_t)a * (dword_t)b
 #define div_dwords(a, b, ret)               *(dword_t*)&ret = (dword_t)a / (dword_t)b
 #define mod_dwords(a, b, ret)               *(dword_t*)&ret = (dword_t)a % (dword_t)b
+#define shl_dword(dword, num, ret)          *(dword_t*)&ret = (dword_t)dword << (byte_t)num
+#define shr_dword(dword, num, ret)          *(dword_t*)&ret = (dword_t)dword >> (byte_t)num
 #endif
 
 #ifdef _VLGBL_CUSTOM_QWORDS

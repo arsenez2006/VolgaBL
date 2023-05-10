@@ -91,15 +91,6 @@ __start:
     mov cx, 16
     call memcmp
     pop cx
-    jc short .next
-
-    ; Check partiotion name
-    push cx
-    mov si, ssl_part_name
-    add di, 0x38
-    mov cx, 10
-    call memcmp
-    pop cx
     jnc short .found
 
 .next:
@@ -195,8 +186,7 @@ drive_number db 0x00
 msg_loading db"Loading VolgaOS...",13,10,0
 msg_fail db" - MBR fail.",0
 gpt_sig db"EFI PART"
-ssl_part_type db"Hah!IdontNeedEFI"
-ssl_part_name db'V',0,'L',0,'G',0,'B',0,'L',0
+ssl_part_type db 0x53,0xE6,0x86,0xC5,0x91,0x79,0x47,0x49,0xAC,0x24,0x75,0xF8,0xCF,0xF9,0x94,0x5C ; C586E653-7991-4947-AC24-75F8CFF9945C
 DAP:
 .size:      db 0x10
 .rsv:       db 0x00

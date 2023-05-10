@@ -48,18 +48,24 @@ __start:
 
     ; Get drive parameteres
     pusha
-    mov ah, 0x48
+    push ds
     mov dl, byte [drive_number]
-    mov si, (0x8000 - 0x7C00)
+    mov ax, es
+    mov ds, ax
+    mov ah, 0x48
+    mov si, 0x00
     mov word [es:0x00], 0x1E
     int 0x13
+    pop ds
     mov al, '3'
     jc near .fail
+    cmp word [es:0x18], 512
+    mov al, '7'
+    jne near .fail
     popa
 
-    ; Get sector size
-    movzx ebx, word [es:0x18]
     ; Calculate size of Partition table in sectors
+    mov ebx, 512
     div ebx
     or edx, edx
     jz short .skip_inc

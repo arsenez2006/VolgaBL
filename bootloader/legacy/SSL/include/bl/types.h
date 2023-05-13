@@ -32,13 +32,22 @@ typedef enum { false, true } bool;
 #endif
 
 typedef struct _memory_map_entry {
-    struct _memory_map_entry* next;
-    struct _memory_map_entry* prev;
     qword_t base;
     qword_t limit;
     dword_t type;
     dword_t ACPI;
 } memory_map_entry;
+
+typedef struct _memory_map_node {
+    struct _memory_map_node* next;
+    struct _memory_map_node* prev;
+    memory_map_entry entry;
+} memory_map_node;
+
+typedef struct _memory_map {
+    memory_map_node* list;
+    size_t count;
+} memory_map;
 
 typedef struct _GPT_header {
     byte_t magic[8];
@@ -64,6 +73,12 @@ typedef struct _GPT_partition_entry {
     qword_t end_lba;
     qword_t attrs;
 } GPT_partition_entry;
+
+typedef struct _GPT_partition_array {
+    GPT_partition_entry* array;
+    size_t entry_size;
+    size_t count;
+} GPT_partition_array;
 
 typedef enum {
     GDT_ACCESS_PRESENT      = (1 << 7),

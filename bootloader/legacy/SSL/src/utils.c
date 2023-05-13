@@ -23,14 +23,18 @@ void set_GDTR48(GDTR48 *gdtr, const void *entries, size_t size) {
     add_dwords(segment, offset, gdtr->data[2]);
 }
 
-void dump_mem_map(memory_map_entry* mem_map) {
-    while (mem_map) {
+void dump_mem_map(memory_map* mem_map) {
+    memory_map_node* node = mem_map->list;
+    while (node) {
+        qword_t base = node->entry.base;
+        qword_t limit = node->entry.limit;
+        dword_t type = node->entry.type;
         printf(
             "Base address = 0x%.4hx%.4hx%.4hx%.4hx, Limit = 0x%.4hx%.4hx%.4hx%.4hx, Type = %hd\n",
-            mem_map->base.datah.datah, mem_map->base.datah.datal, mem_map->base.datal.datah, mem_map->base.datal.datal,
-            mem_map->limit.datah.datah, mem_map->limit.datah.datal, mem_map->limit.datal.datah, mem_map->limit.datal.datal,
-            mem_map->type.datal
+            base.datah.datah, base.datah.datal, base.datal.datah, base.datal.datal,
+            limit.datah.datah, limit.datah.datal, limit.datal.datah, limit.datal.datal,
+            type.datal
         );
-        mem_map = mem_map->next;
+        node = node->next;
     }
 }

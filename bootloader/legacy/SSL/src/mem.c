@@ -1,5 +1,6 @@
 #include <bl/mem.h>
 #include <bl/io.h>
+#include <bl/string.h>
 
 extern char _heap;
 extern word_t _heap_size;
@@ -101,7 +102,7 @@ void* malloc(size_t count) {
     size_t block_left = free_block->size - count;
     free_block->free = false;
     free_block->size = count;
-    if (block_left < _mem_ctx.hdr_aligned_size + 2) {
+    if (block_left < _mem_ctx.hdr_aligned_size + 16) {
         free_block->size += block_left;
     } else {
         _allocate_block(free_block, block_left - _mem_ctx.hdr_aligned_size);
@@ -111,6 +112,53 @@ void* malloc(size_t count) {
     _find_max_block();
     
     return (byte_t*)free_block + _mem_ctx.hdr_aligned_size;
+}
+
+void* realloc(void* mem, size_t new_size) {
+    _block_hdr* block = (_block_hdr*)((byte_t*)mem - _mem_ctx.hdr_aligned_size);
+    new_size = _align16(new_size);
+
+    if (block->size > new_size) {
+        /* Decrease block size */
+        size_t block_left = block->size - new_size;
+        block->size = new_size;
+        if (block_left < _mem_ctx.hdr_aligned_size + 16) {
+            /* Cannot decrease block size */
+            block->size += block_left;
+            return mem;
+        } else {
+            /* Allocate new block from decreased size */
+            _allocate_block(block, block_left - _mem_ctx.hdr_aligned_size);
+
+            /* Try to merge new block with it's next block */
+            if (block->next->next && block->next->next->free) {
+                _merge_blocks(block->next, block->next->next);
+            }
+
+            /* Find new max block */
+            _find_max_block();
+            return mem;
+        }
+
+    } else if (block->size < new_size) {
+        /* Allocate new memory */
+        void* new_mem;
+        if ((new_mem = malloc(new_size)) == NULL) {
+            /* Failed to allocate new memory */
+            return NULL;
+        }
+
+        /* Copy data to new memory */
+        memcpy(new_mem, mem, block->size);
+
+        /* Free old memory */
+        free(mem);
+
+        return new_mem;
+    } else {
+        /* No reallocation needed */
+        return mem;
+    }
 }
 
 void free(void *mem) {

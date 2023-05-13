@@ -4,7 +4,7 @@
 
 void set_GDT_entry(GDT_entry* entry, word_t basel, word_t baseh, word_t limitl, word_t limith, GDT_flags flags, GDT_access access);
 void set_GDTR48(GDTR48* gdtr, const void* entries, size_t size);
-void dump_mem_map(memory_map_entry* mem_map);
+void dump_mem_map(memory_map* mem_map);
 
 extern word_t get_ds();
 extern void load_GDT(GDTR48);

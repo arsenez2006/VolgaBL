@@ -17,7 +17,7 @@ set(OUT_ISO_SSL_OFF 2048)
 set(OUT_ISO_SSL_COUNT 128)
 set(OUT_ISO_TSL_BS 512)
 set(OUT_ISO_TSL_OFF 4096)
-set(OUT_ISO_TSL_COUNT 896)
+set(OUT_ISO_TSL_COUNT 128)
 
 if(NOT EXISTS ${OUT_ISO})
     exec_program(${DD}
@@ -27,6 +27,11 @@ if(NOT EXISTS ${OUT_ISO})
         ARGS ${OUT_ISO} < ${PROJECT_SOURCE_DIR}/disk_layout.map
     )
 endif()
+
+# Target for remapping ISO
+add_custom_target(remap 
+    COMMAND ${SFDISK} ${OUT_ISO} < ${PROJECT_SOURCE_DIR}/disk_layout.map
+)
 
 # Compile bootloader
 add_subdirectory(bootloader/legacy)

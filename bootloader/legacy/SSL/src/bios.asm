@@ -4,11 +4,14 @@ global _bios_putch
 global _bios_read_drive
 global _bios_get_drive_parameteres
 global _bios_get_e820
+global _bios_serial_init
+global _bios_serial_putch
 
 section .text
 _bios_putch:
     push bp
     mov bp, sp
+    push ax
     push bx
 
     mov al, byte [bp + 4]
@@ -17,6 +20,7 @@ _bios_putch:
     int 0x10
 
     pop bx
+    pop ax
     mov sp, bp
     pop bp
     ret
@@ -100,6 +104,46 @@ _bios_get_e820:
     pop ecx
     pop ebx
     pop si
+    mov sp, bp
+    pop bp
+    ret
+
+_bios_serial_init:
+    push bp
+    mov bp, sp
+    push dx
+
+    mov al, 11100011b
+    mov ah, 0x00
+    mov dx, 0x00
+    int 0x14
+
+    jnc short .success
+
+.fail:
+    mov ax, 0x00
+    jmp short .ret
+.success:
+    mov ax, 0x01
+.ret:
+    pop dx
+    mov sp, bp
+    pop bp
+    ret
+
+_bios_serial_putch:
+    push bp
+    mov bp, sp
+    push ax
+    push dx
+
+    mov al, byte [bp + 4]
+    mov ah, 0x01
+    mov dx, 0x00
+    int 0x14
+
+    pop dx
+    pop ax
     mov sp, bp
     pop bp
     ret

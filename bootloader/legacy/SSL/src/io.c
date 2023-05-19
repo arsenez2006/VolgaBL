@@ -19,6 +19,16 @@ static void _buffer_out(void* buffer, size_t max_size, size_t index, char ch) {
     }
 }
 
+static void _buffer_serial(void* buffer, size_t max_size, size_t index, char ch) {
+    (void)buffer; (void)max_size; (void)index;
+
+    if (ch == '\n') {
+        bios_serial_putch('\r'); bios_serial_putch('\n');
+    } else {
+        bios_serial_putch(ch);
+    }
+}
+
 static void _buffer_null(void* buffer, size_t max_size, size_t index, char ch) {
     (void)buffer; (void)max_size; (void)index; (void)ch;
 }
@@ -430,6 +440,18 @@ int printf(const char *format, ...) {
 
     va_start(va, format);
     ret = _vsnprintf(buffer, SIZE_MAX, format, va, _buffer_out);
+    va_end(va);
+
+    return ret;
+}
+
+int serial_printf(const char* format, ...) {
+    va_list va;
+    char buffer[1];
+    int ret;
+
+    va_start(va, format);
+    ret = _vsnprintf(buffer, SIZE_MAX, format, va, _buffer_serial);
     va_end(va);
 
     return ret;

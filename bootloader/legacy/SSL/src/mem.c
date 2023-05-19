@@ -185,7 +185,7 @@ void mem_dump() {
     size_t block_index = 0;
     _block_hdr* block;
     
-    printf(
+    serial_printf(
         "Start = %.4p\n"
         "Max alloc = %zu bytes\n"
         "Header size = %zu\n",
@@ -195,7 +195,7 @@ void mem_dump() {
     );
 
     for (block = (_block_hdr*)_mem_ctx.start; block != NULL; block = block->next) {
-        printf(
+        serial_printf(
             "Block %zu:\n"
             "    Free = %d\n"
             "    Block address = %.4p\n"

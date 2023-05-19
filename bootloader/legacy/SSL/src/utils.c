@@ -29,7 +29,7 @@ void dump_mem_map(memory_map* mem_map) {
         qword_t base = node->entry.base;
         qword_t limit = node->entry.limit;
         dword_t type = node->entry.type;
-        printf(
+        serial_printf(
             "Base address = 0x%.4hx%.4hx%.4hx%.4hx, Limit = 0x%.4hx%.4hx%.4hx%.4hx, Type = %hd\n",
             base.datah.datah, base.datah.datal, base.datal.datah, base.datal.datal,
             limit.datah.datah, limit.datah.datal, limit.datal.datah, limit.datal.datal,

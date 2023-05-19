@@ -26,5 +26,7 @@ extern void bios_putch(byte_t);
 extern bool bios_read_drive(const DAP*);
 extern bool bios_get_drive_parameteres(drive_parameteres* buffer);
 extern bool bios_get_e820(dword_t* offset, word_t buf_size, void* buffer);
+extern bool bios_serial_init();
+extern void bios_serial_putch(byte_t);
 
 #endif

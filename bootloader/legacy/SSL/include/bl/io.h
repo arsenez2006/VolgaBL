@@ -7,5 +7,6 @@ int vsnprintf(char* s, size_t n, const char* format, va_list arg);
 int snprintf(char* s, size_t n, const char* format, ...);
 int sprintf(char* s, const char* format, ...);
 int printf(const char* format, ...);
+int serial_printf(const char* format, ...);
 
 #endif

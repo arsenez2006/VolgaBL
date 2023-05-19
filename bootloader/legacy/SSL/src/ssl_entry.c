@@ -177,6 +177,9 @@ word_t ssl_entry() {
     /* Print loading message*/
     printf("Loading VLGBL...\n");
 
+    /* Initialize COM port */
+    bios_serial_init();
+
     /* Initialize CRC32 polynom table */
     init_crc32();
 
@@ -296,7 +299,14 @@ word_t ssl_entry() {
         return 1;
     }
 
-    //mem_dump();
+    /* Find kernel partition */
+    GPT_partition_entry* kernel_partition;
+    if ((kernel_partition = find_partition(partition_array, kernel_partition_type)) == NULL) {
+        print_error("Failed to find kernel partition");
+        return 1;
+    }
+
+    mem_dump();
 
     return 0;
 }

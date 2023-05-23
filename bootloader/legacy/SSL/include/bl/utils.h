@@ -7,6 +7,7 @@ void set_GDTR48(GDTR48* gdtr, const void* entries, size_t size);
 void dump_mem_map(memory_map* mem_map);
 
 extern word_t get_ds();
+extern bool enable_A20();
 extern void load_GDT(GDTR48);
 extern void enter_unreal(word_t data_segment);
 extern void init_crc32();

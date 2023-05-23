@@ -2,6 +2,7 @@ cpu 386
 bits 16
 
 global _get_ds
+global _enable_A20
 global _load_GDT
 global _enter_unreal
 global _init_crc32
@@ -21,6 +22,146 @@ crc32table:
 section .text
 _get_ds:
     mov ax, ds
+    ret
+
+check_A20:
+    pushf
+    push ds
+    push es
+    push di
+    push si
+ 
+    cli
+ 
+    xor ax, ax ; ax = 0
+    mov es, ax
+ 
+    not ax ; ax = 0xFFFF
+    mov ds, ax
+ 
+    mov di, 0x0500
+    mov si, 0x0510
+ 
+    mov al, byte [es:di]
+    push ax
+ 
+    mov al, byte [ds:si]
+    push ax
+ 
+    mov byte [es:di], 0x00
+    mov byte [ds:si], 0xFF
+ 
+    cmp byte [es:di], 0xFF
+ 
+    pop ax
+    mov byte [ds:si], al
+ 
+    pop ax
+    mov byte [es:di], al
+ 
+    mov ax, 0
+    je .ret
+ 
+    mov ax, 1
+ 
+.ret:
+    pop si
+    pop di
+    pop es
+    pop ds
+    popf
+
+    ret
+
+_enable_A20:
+    ; Check if A20 is already enabled
+    call check_A20
+    or ax, ax
+    jnz near .ret  ; A20 enabled
+
+    ; Try BIOS method
+    jmp .kb_success
+    mov ax, 0x2403
+    int 0x15
+    jb short .bios_fail
+    cmp ah, 0
+    jnz short .bios_fail
+
+    mov ax, 0x2402
+    int 0x15
+    jb short .bios_fail
+    cmp ah, 0
+    jnz short .bios_fail
+
+    cmp al, 1
+    jz short .bios_success
+
+    mov ax, 0x2401
+    int 0x15
+    jb short .bios_fail
+    cmp ah, 0
+    jnz short .bios_fail
+
+.bios_success:
+    call check_A20
+    or ax, ax
+    jnz short .ret  ; A20 enabled
+.bios_fail:
+    ; Try keyboard controller method
+    cli
+
+    call .kb_wait
+    mov al, 0xAD
+    out 0x64, al
+
+    call .kb_wait
+    mov al, 0xD0
+    out 0x64, al
+
+    call .kb_wait2
+    in al, 0x60
+    push ax
+
+    call .kb_wait
+    mov al, 0xD1
+    out 0x64, al
+
+    call .kb_wait
+    pop ax
+    or al, 2
+    out 0x60, al
+
+    call .kb_wait
+    mov al, 0xAE
+    out 0x64, al
+
+    call .kb_wait
+    sti
+    jmp short .kb_success
+
+.kb_wait:
+    in al, 0x64
+    test al, 2
+    jnz short .kb_wait
+    ret
+.kb_wait2:
+    in al, 0x64
+    test al, 1
+    jz short .kb_wait2
+    ret
+
+.kb_success:
+    call check_A20
+    or ax, ax
+    jnz short .ret  ; A20 enabled
+
+    ; Try Fast A20 method
+    in al, 0x92
+    or al, 2
+    out 0x92, al
+
+    call check_A20
+.ret:
     ret
 
 _load_GDT:

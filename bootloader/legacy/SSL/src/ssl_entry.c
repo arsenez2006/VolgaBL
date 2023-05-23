@@ -177,6 +177,12 @@ word_t ssl_entry() {
     /* Print loading message*/
     printf("Loading VLGBL...\n");
 
+    /* Enable A20 line */
+    if (!enable_A20()) {
+        print_error("Failed to enable A20 line");
+        return 1;
+    }
+
     /* Initialize COM port */
     bios_serial_init();
 

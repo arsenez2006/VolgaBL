@@ -50,7 +50,7 @@ __start:
     mov ax, STACK_SEG
     mov ss, ax
     mov sp, STACK_INIT
-    mov byte [drive_number], dl
+    mov byte [drive_number], dl ; Save drive number
     sti
 
     ; Print loading message
@@ -176,6 +176,10 @@ __start:
 ; -------------------------------------------------------------------------------------------------
 ; PROCEDURES
 ; -------------------------------------------------------------------------------------------------
+
+; print
+; Prints string to terminal, using BIOS
+; INPUT: DS:SI - Pointer to null-terminated string
 print:
     xor bx, bx
     mov ah, 0x0E
@@ -188,6 +192,13 @@ print:
 .ret:
     ret
 
+; read_drive
+; Reads sectors from saved drive, using DAP
+; INPUT: Filled DAP
+; OUTPUT: CF is set on error, clear on success
+; LIMITATIONS: 
+;   - Maximum buffer size is 64KB (1 real mode segment)
+;   - Some BIOSes can't read more than 127 sectors
 read_drive:
     mov ah, 0x42
     mov dl, byte [drive_number]
@@ -195,6 +206,14 @@ read_drive:
     int 0x13
     ret
 
+; memcmp
+; Compares data
+; INPUT:
+;   - DS:SI - pointer to the first block of data
+;   - ES:DI - pointer to the second block of data
+;   - CX - number of bytes to compare
+; OUTPUT: CF is set on mismatch, clear if equal
+; Saves all registers, except FLAGS
 memcmp:
     pusha
 .loop:
@@ -216,16 +235,26 @@ memcmp:
 ; DATA
 ; -------------------------------------------------------------------------------------------------
 section .data
+
+; Saved drive number
 drive_number db 0x00
+
+; Messages
 msg_loading db"Loading VolgaOS...",13,10,0
 msg_fail db" - MBR fail.",0
+
+; GPT signature
 gpt_sig db"EFI PART"
+
+; Second Stage Loader GPT partition type
 ssl_part_type db 0x53,0xE6,0x86,0xC5,0x91,0x79,0x47,0x49,0xAC,0x24,0x75,0xF8,0xCF,0xF9,0x94,0x5C ; C586E653-7991-4947-AC24-75F8CFF9945C
+
+; Disk Address Packet used for read_drive procedure
 DAP:
-.size:      db 0x10
-.rsv:       db 0x00
-.sectors:   dw 0x0001
-.offset:    dw 0x0000
-.segment:   dw 0x1000
-.lba_low:   dd 0x00000001
-.lba_high:  dd 0x00000000
+.size:      db 0x10         ; Always 16
+.rsv:       db 0x00         ; Always 0
+.sectors:   dw 0x0001       ; first 8 bits - number of sectors to read, 9 - 16 must be zeroed
+.offset:    dw 0x0000       ; Buffer offset
+.segment:   dw 0x1000       ; Buffer segment
+.lba_low:   dd 0x00000001   ; LBA of the disk (low 32 bits)
+.lba_high:  dd 0x00000000   ; LBA of the disk (high 32 bits)

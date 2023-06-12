@@ -69,21 +69,25 @@ __start:
     mov cr0, eax
     ; Clear instruction pipeline
     jmp short $+2
-bits 32
-.pm:
+
     ; Set 32bit segments
-    mov eax, 0x10
-    mov ds, eax
-    mov es, eax
-    mov ss, eax
-    mov fs, eax
-    mov gs, eax
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov fs, ax
+    mov gs, ax
 
-    ; Temporary stack
-    mov esp, 0x7C00
+    ; Fix stack
+    and esp, 0xFFFF
+    add esp, 0x10000
 
-    ; Jump to Third Stage Loader
-    ;jmp 0x8:0x20000
+    ; I spent two weeks to realize that CPU still uses 16bit offset for jump, so I'll make a jump stub in the beggining of memory
+    mov byte [0x00], 0xE9
+    mov dword [0x01], 0x20000
+
+    ; Jump to the Third Stage Loader
+    jmp 0x08:0x0000
 bits 16
 .halt:
     hlt

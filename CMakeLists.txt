@@ -9,6 +9,7 @@ find_dependencies()
 
 # ISO variables
 set(OUT_ISO ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.iso)
+# set(OUT_ISO /dev/sdc)
 set(OUT_ISO_MBR_BS 1)
 set(OUT_ISO_MBR_OFF 0)
 set(OUT_ISO_MBR_COUNT 446)

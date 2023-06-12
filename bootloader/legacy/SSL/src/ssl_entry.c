@@ -312,6 +312,16 @@ word_t ssl_entry() {
         return 1;
     }
 
+    /* Load Third Stage Loader */
+    read_context.segment = 0x2000;
+    read_context.offset = 0x0000;
+    read_context.sectors = 128;
+    read_context.lba = tsl_partition->start_lba;
+    if(!bios_read_drive(&read_context)) {
+        print_error("Failed to load Third Stage Loader");
+        return 1;
+    }
+
     mem_dump();
 
     return 0;

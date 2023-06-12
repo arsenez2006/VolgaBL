@@ -1,6 +1,39 @@
 cpu 386
 bits 16
 global __start
+
+; -------------------------------------------------------------------------------------------------
+; DEFINES
+; -------------------------------------------------------------------------------------------------
+%define MBR_ADDR        0x7C00
+%define MBR_SEG         MBR_ADDR >> 4
+
+%define SSL_ADDR        0x10000
+%define SSL_SIZE        64 * 1024
+%define SSL_SEG         SSL_ADDR >> 4
+%define SSL_SECTORS     SSL_SIZE / 512 - 1  ; FIXME: Some BIOSes can't read more than 127 sectors
+
+%define BUFF_ADDR       SSL_ADDR
+%define BUFF_SEG        BUFF_ADDR >> 4
+
+%define STACK_BOT_ADDR  0x500
+%define STACK_TOP_ADDR  MBR_ADDR - 16
+%define STACK_SEG       STACK_BOT_ADDR >> 4
+%define STACK_INIT      STACK_TOP_ADDR - STACK_BOT_ADDR
+
+%define SECTOR_SIZE     512
+
+; -------------------------------------------------------------------------------------------------
+; MBR ERROR CODES:
+;   1 - BIOS does not suppport int 13h extensions
+;   2 - Boot drive has invalid sector size
+;   3 - Failed to read GPT header
+;   4 - Drive is not GPT
+;   5 - Failed to read partition table
+;   6 - Failed to find Second Stage Loader
+;   7 - Failed to load Second Stage Loader
+; -------------------------------------------------------------------------------------------------
+
 ; -------------------------------------------------------------------------------------------------
 ; MBR ENTRY
 ; -------------------------------------------------------------------------------------------------
@@ -8,15 +41,15 @@ section .text
 __start:
     ; Initialize segments
     cli
-    jmp 0x07C0:.cs
+    jmp MBR_SEG:.cs
 .cs:
-    mov ax, 0x07C0
+    mov ax, MBR_SEG
     mov ds, ax
-    mov ax, 0x1000
+    mov ax, BUFF_SEG
     mov es, ax
-    mov ax, 0x0050
+    mov ax, STACK_SEG
     mov ss, ax
-    mov sp, 0x76F0
+    mov sp, STACK_INIT
     mov byte [drive_number], dl
     sti
 
@@ -24,17 +57,40 @@ __start:
     mov si, msg_loading
     call print
 
+    ; Check int 13h extensions
+    mov ah, 0x41
+    mov bx, 0x55AA
+    int 0x13
+    mov al, '1'
+    jc near .fail
+    cmp bx, 0xAA55
+    jne near .fail
+
+    ; Check sector size
+    mov byte [es:0x00], 26  ; Result buffer size (Excludes EDD)
+    push ds
+    mov ax, es
+    mov ds, ax
+    xor si, si  ; DS:SI = Result buffer
+    mov ah, 0x48
+    int 0x13
+    pop ds
+    mov al, '2'
+    jc near .fail
+    cmp word [es:0x18], SECTOR_SIZE
+    jne near .fail
+
     ; Read GPT Header
     call read_drive
-    mov al, '1'
+    mov al, '3'
     jc near .fail
 
     ; Check GPT Signature
     mov si, gpt_sig
-    mov di, 0x00
+    xor di, di
     mov cx, 8
     call memcmp
-    mov al, '2'
+    mov al, '4'
     jc near .fail
 
     ; Get Number of Partition Entries
@@ -45,24 +101,6 @@ __start:
     push ebx
     ; Calculate size of Partition table
     mul ebx
-
-    ; Get drive parameteres
-    pusha
-    push ds
-    mov dl, byte [drive_number]
-    mov ax, es
-    mov ds, ax
-    mov ah, 0x48
-    mov si, 0x00
-    mov word [es:0x00], 0x1E
-    int 0x13
-    pop ds
-    mov al, '3'
-    jc near .fail
-    cmp word [es:0x18], 512
-    mov al, '7'
-    jne near .fail
-    popa
 
     ; Calculate size of Partition table in sectors
     mov ebx, 512
@@ -78,17 +116,16 @@ __start:
     mov dword [DAP.lba_low], eax
     mov eax, dword [es:(0x48 + 4)]
     mov dword [DAP.lba_high], eax
-    
+
     ; Read Partition table
     call read_drive
-    mov al, '4'
-    jc near .fail
+    mov al, '5'
+    jc short .fail
 
     ; Find SSL Partition header
     pop ebp         ; Entry size
     pop ecx         ; Entries count
     mov edx, 0x00   ; Start offset
-
 .loop:
     ; Check partiotion type
     push cx
@@ -102,8 +139,8 @@ __start:
 .next:
     add edx, ebp
     loop .loop
-    mov al, '5'
-    jmp near .fail
+    mov al, '6'
+    jmp short .fail
 .found:
 
     mov ebp, edx
@@ -112,27 +149,18 @@ __start:
     mov eax, dword [es:(ebp + 0x20 + 0)]
     mov ebx, dword [es:(ebp + 0x20 + 4)]
 
-    ; Get SSL End LBA (EDX:ECX)
-    mov ecx, dword [es:(ebp + 0x28 + 0)]
-    mov edx, dword [es:(ebp + 0x28 + 4)]
-
-    ; Calculate SSL Sectors count (EDX:ECX)
-    sub ecx, eax
-    sbb edx, ebx
-    inc ecx
-
     ; Update DAP
     mov dword [DAP.lba_low], eax
     mov dword [DAP.lba_high], ebx
-    mov word [DAP.sectors], cx
+    mov word [DAP.sectors], SSL_SECTORS
 
     ; Load SSL to memory
     call read_drive
-    mov al, '6'
-    jc near .fail
+    mov al, '7'
+    jc short .fail
 
     ; Far jump to SSL
-    jmp 0x1000:0x0000
+    jmp SSL_SEG:0x0000
 
 .halt:
     hlt

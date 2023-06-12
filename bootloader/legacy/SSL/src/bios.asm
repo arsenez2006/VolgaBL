@@ -39,6 +39,23 @@ _bios_read_drive:
     int 0x13
     jnc short .success
 
+    ; Some BIOSes can't read more than 127 sectors
+    cmp word [si + 2], 127
+    jle short .fail
+
+    ; Read first 127 sectors
+    mov word [si + 2], 127
+    mov ah, 0x42
+    int 0x13
+    jc short .fail
+
+    ; Read last sector
+    mov word [si + 2], 1
+    add word [si + 4], 127 * 512
+    mov ah, 0x42
+    int 0x13
+    jnc short .success
+
 .fail:
     mov ax, 0
     jmp short .ret

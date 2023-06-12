@@ -19,7 +19,7 @@ static const byte_t tsl_partition_type[] =
 { 0xC7, 0x0D, 0x6D, 0x87, 0x66, 0xCF, 0x63, 0x4C, 0xBC, 0xEE, 0xBD, 0x79, 0xEE, 0x10, 0xF5, 0x93 }; // 876D0DC7-CF66-4C63-BCEE-BD79EE10F593
 
 static int print_error(const char* error_str) {
-    return printf("VLGBL Error: %s.", error_str);
+    return printf("VLGBL Error: %s.\n", error_str);
 }
 
 static memory_map* get_memory_map() {

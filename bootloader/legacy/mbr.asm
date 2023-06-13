@@ -1,6 +1,6 @@
 cpu 386
 bits 16
-global __start
+global __bootstrap
 
 ; -------------------------------------------------------------------------------------------------
 ; DEFINES
@@ -38,7 +38,7 @@ global __start
 ; MBR ENTRY
 ; -------------------------------------------------------------------------------------------------
 section .text
-__start:
+__bootstrap:
     ; Initialize segments
     cli
     jmp MBR_SEG:.cs
@@ -53,6 +53,7 @@ __start:
     mov byte [drive_number], dl ; Save drive number
     sti
 
+start:
     ; Print loading message
     mov si, msg_loading
     call print
@@ -160,7 +161,7 @@ __start:
     jc short .fail
 
     ; Far jump to SSL
-    jmp SSL_SEG:0x0000
+    ;jmp SSL_SEG:0x0000
 
 .halt:
     hlt
@@ -236,9 +237,6 @@ memcmp:
 ; -------------------------------------------------------------------------------------------------
 section .data
 
-; Saved drive number
-drive_number db 0x00
-
 ; Messages
 msg_loading db"Loading VolgaOS...",13,10,0
 msg_fail db" - MBR fail.",0
@@ -246,8 +244,8 @@ msg_fail db" - MBR fail.",0
 ; GPT signature
 gpt_sig db"EFI PART"
 
-; Second Stage Loader GPT partition type
-ssl_part_type db 0x53,0xE6,0x86,0xC5,0x91,0x79,0x47,0x49,0xAC,0x24,0x75,0xF8,0xCF,0xF9,0x94,0x5C ; C586E653-7991-4947-AC24-75F8CFF9945C
+; Second Stage Loader GPT partition type (C586E653-7991-4947-AC24-75F8CFF9945C)
+ssl_part_type db 0x53,0xE6,0x86,0xC5,0x91,0x79,0x47,0x49,0xAC,0x24,0x75,0xF8,0xCF,0xF9,0x94,0x5C 
 
 ; Disk Address Packet used for read_drive procedure
 DAP:
@@ -258,3 +256,10 @@ DAP:
 .segment:   dw 0x1000       ; Buffer segment
 .lba_low:   dd 0x00000001   ; LBA of the disk (low 32 bits)
 .lba_high:  dd 0x00000000   ; LBA of the disk (high 32 bits)
+
+; -------------------------------------------------------------------------------------------------
+; BSS
+; -------------------------------------------------------------------------------------------------
+section .bss
+; Saved drive number
+drive_number resb 0x00

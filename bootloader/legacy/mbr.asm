@@ -41,6 +41,7 @@ section .text
 __bootstrap:
     ; Initialize segments
     cli
+    cld
     jmp MBR_SEG:.cs
 .cs:
     mov ax, MBR_SEG
@@ -161,7 +162,7 @@ start:
     jc short .fail
 
     ; Far jump to SSL
-    ;jmp SSL_SEG:0x0000
+    jmp SSL_SEG:0x0000
 
 .halt:
     hlt

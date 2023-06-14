@@ -12,7 +12,7 @@ SECTIONS
         *(.text)
         *(.data)
     } > MBR_code
-    .bss :
+    .bss (NOLOAD) :
     {
         *(.bss)
     } > MBR_bss

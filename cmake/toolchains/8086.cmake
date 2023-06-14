@@ -43,4 +43,4 @@ set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <LINK_FLAGS> -o <TARGET> <OBJECTS>")
 
 # Linker
 find_program(CMAKE_LINKER gcc REQUIRED)
-set(CMAKE_EXE_LINKER_FLAGS "-march=i386 -m16 -nostartfiles -nodefaultlibs -nolibc -nostdlib -e __bootstrap -s -static")
+set(CMAKE_EXE_LINKER_FLAGS "-march=i386 -m16 -nostartfiles -nodefaultlibs -nolibc -nostdlib -e __bootstrap -s -static -Xlinker \"--oformat=binary\"")

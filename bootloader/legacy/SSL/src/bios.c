@@ -34,7 +34,7 @@ bool bios_get_e820(dword_t* offset, dword_t buf_size, void* buffer) {
     __asm__ volatile(
         "int $0x15"
         : "=a"(SMAP_sig), "=b"(*offset)
-        : "a"((word_t)0xE820), "d"((dword_t)0x534D4150),"b"(*offset), "c"(buf_size), "D"((word_t)((dword_t)buffer & 0xFFFF))
+        : "a"((word_t)0xE820), "d"((dword_t)0x534D4150),"b"(*offset), "c"(buf_size), "D"((word_t)((uintptr_t)buffer & 0xFFFF))
     );
     if (SMAP_sig != 0x534D4150) {
         return false;
@@ -47,7 +47,17 @@ bool bios_get_drive_parameteres(drive_parameteres* buffer) {
     __asm__ volatile(
         "int $0x13"
         : "=@ccc"(ret)
-        : "a"((word_t)0x4800), "d"(_drive_number), "S"((word_t)((dword_t)buffer & 0xFFFF))
+        : "a"((word_t)0x4800), "d"(_drive_number), "S"((word_t)((uintptr_t)buffer & 0xFFFF))
+    );
+    return !ret;
+}
+
+bool bios_read_drive(const DAP* read_context) {
+    bool ret;
+    __asm__ volatile(
+        "int $0x13"
+        : "=@ccc"(ret)
+        : "a"((word_t)0x4200), "d"(_drive_number), "S"((word_t)((uintptr_t)read_context & 0xFFFF))
     );
     return !ret;
 }

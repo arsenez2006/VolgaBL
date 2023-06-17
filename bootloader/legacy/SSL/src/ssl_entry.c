@@ -4,6 +4,7 @@
 #include <bl/io.h>
 #include <bl/utils.h>
 #include <bl/mem.h>
+#include <bl/string.h>
 
 /* GDT for Protected mode */
 static GDTR32 gdtr_pm;
@@ -25,6 +26,9 @@ static int print_error(const char *error_str) {
 void __noreturn ssl_entry(void) {
     memory_map* mem_map;
     drive_parameteres drive_params;
+    GPT_header* gpt_hdr;
+    DAP read_context;
+    dword_t gpt_crc32, gpt_crc32_copy;
 
     /* Print loading message */
     printf("Loading VLGBL...\n");
@@ -82,6 +86,47 @@ void __noreturn ssl_entry(void) {
         print_error("Wrong sector size, aborting");
         goto halt;
     }
+
+    /* Read GPT header */
+    if ((gpt_hdr = malloc(512)) == NULL) {
+        print_error("Failed to read GPT header.");
+        goto halt;
+    }
+
+    read_context.size = sizeof(DAP);
+    read_context.rsv = 0;
+
+    read_context.sectors = 1;
+    read_context.segment = get_ds();
+    read_context.offset = (word_t)((uintptr_t)gpt_hdr & 0xFFFF);
+    read_context.lba = 1;
+
+    if(!bios_read_drive(&read_context)) {
+        print_error("Failed to read GPT header.");
+        goto halt;
+    }
+    if ((gpt_hdr = realloc(gpt_hdr, sizeof(GPT_header))) == NULL) {
+        print_error("Failed to read GPT header.");
+        goto halt;
+    }
+
+    /* Check GPT Signature */
+    if(memcmp(gpt_hdr->magic, "EFI PART", 8) != 0) {
+        print_error("Drive is not GPT");
+        goto halt;
+    }
+
+    /* Compare GPT checksum */
+    gpt_crc32_copy = gpt_hdr->crc32;
+    gpt_hdr->crc32 = 0;
+    gpt_crc32 = crc32((byte_t*)gpt_hdr, sizeof(GPT_header));
+    if (gpt_crc32 != gpt_crc32_copy) {
+        print_error("GPT header is corrupted. CRC32 mismatch");
+        goto halt;
+    }
+
+    /* Save drive GUID */
+    memcpy(drive_GUID, gpt_hdr->guid, 16);
 
     dump_heap();
     dump_memory_map(mem_map);

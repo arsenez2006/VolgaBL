@@ -9,12 +9,13 @@ set(TSL_TARGET ${PROJECT_NAME}_tsl)
 # Compile MBR
 add_executable(${MBR_TARGET} EXCLUDE_FROM_ALL mbr.asm)
 set_source_files_properties(mbr.asm PROPERTIES 
-    COMPILE_FLAGS "-f elf32"
+    COMPILE_FLAGS "${ASM_8086_FLAGS}"
 )
 set_target_properties(${MBR_TARGET} PROPERTIES
     LINK_DEPENDS ${PROJECT_SOURCE_DIR}/mbr.ld
+    LINK_FLAGS "-Xlinker --oformat=binary -Xlinker -Map=${PROJECT_BINARY_DIR}/${MBR_TARGET}.map -T ${PROJECT_SOURCE_DIR}/mbr.ld"
 )
-target_link_options(${MBR_TARGET} PRIVATE -T ${PROJECT_SOURCE_DIR}/mbr.ld)
+target_link_options(${MBR_TARGET} PRIVATE ${LINK_8086_FLAGS})
 
 # Compile SSL
 file(GLOB_RECURSE SSL_C_SRCS "SSL/src/*.c")
@@ -23,13 +24,17 @@ file(GLOB_RECURSE SSL_HDRS "SSL/include/*.h")
 list(APPEND SSL_SRCS ${SSL_C_SRCS} ${SSL_ASM_SRCS})
 add_executable(${SSL_TARGET} EXCLUDE_FROM_ALL ${SSL_SRCS} ${SSL_HDRS})
 set_source_files_properties(${SSL_ASM_SRCS} PROPERTIES 
-    COMPILE_FLAGS "-f elf32"
+    COMPILE_FLAGS "${ASM_8086_FLAGS}"
+)
+set_source_files_properties(${SSL_C_SRCS} PROPERTIES
+    COMPILE_OPTIONS "${C_8086_FLAGS}"
 )
 target_include_directories(${SSL_TARGET} PRIVATE "SSL/include")
 set_target_properties(${SSL_TARGET} PROPERTIES
     LINK_DEPENDS ${PROJECT_SOURCE_DIR}/SSL/SSL.ld
+    LINK_FLAGS "-Xlinker --oformat=binary -Xlinker -Map=${PROJECT_BINARY_DIR}/${SSL_TARGET}.map -T ${PROJECT_SOURCE_DIR}/SSL/SSL.ld"
 )
-target_link_options(${SSL_TARGET} PRIVATE -T ${PROJECT_SOURCE_DIR}/SSL/SSL.ld)
+target_link_options(${SSL_TARGET} PRIVATE ${LINK_8086_FLAGS})
 
 # # Compile TSL
 # file(GLOB_RECURSE TSL_C_SRCS "TSL/src/*.c")

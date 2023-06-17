@@ -1,4 +1,5 @@
 OUTPUT(binary)
+ENTRY(__bootstrap)
 MEMORY
 {
     SSL_segment (rwx)   : ORIGIN = 0x00000000, LENGTH = 0x00010000
@@ -7,6 +8,8 @@ SECTIONS
 {
     .text :
     {
+        BYTE(0xE9);
+        SHORT(__bootstrap - 3);
         *(.text)
     } > SSL_segment
     .rodata :
@@ -21,4 +24,9 @@ SECTIONS
     {
         *(.bss)
     } > SSL_segment
+    /DISCARD/ :
+    {
+        *(.note*)
+        *(.comment*)
+    }
 }

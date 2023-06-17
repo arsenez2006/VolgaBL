@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-include(cmake/toolchains/8086.cmake)
+include(cmake/toolchain.cmake)
+include(cmake/flags.cmake)
 project(VolgaOS ASM)
 
 include(cmake/options.cmake)

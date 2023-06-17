@@ -4,6 +4,8 @@ bits 16
 global __bootstrap
 global __drive_number
 
+extern _ssl_entry
+
 ; -------------------------------------------------------------------------------------------------
 ; BSS
 ; -------------------------------------------------------------------------------------------------
@@ -34,18 +36,7 @@ __bootstrap:
     mov byte [__drive_number], dl ; Save drive number
     sti
 
-    mov si, msg
-.loop:
-    lodsb
-    or al, al
-    jz short .halt
-    mov ah, 0x0E
-    int 0x10
-    jmp short .loop
-
-.halt:
-    hlt
-    jmp short .halt
+    jmp near _ssl_entry
 
 ; -------------------------------------------------------------------------------------------------
 ; RODATA

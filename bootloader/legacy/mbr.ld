@@ -1,4 +1,5 @@
 OUTPUT(binary)
+ENTRY(__bootstrap)
 MEMORY
 {
     MBR_code (rwx)  : ORIGIN = 0x00000000, LENGTH = 0x000001BE

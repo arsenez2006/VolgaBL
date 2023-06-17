@@ -1,4 +1,7 @@
 #include <bl/utils.h>
+#include <bl/mem.h>
+#include <bl/bios.h>
+#include <bl/string.h>
 
 static const uint32_t crc32table[256] = {
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
@@ -136,4 +139,99 @@ void enter_unreal(word_t data_segment_offset) {
         : [seg] "rm"(data_segment_offset)
         : "eax", "bx"
     );
+}
+
+GPT_partition_array *get_partition_array(const GPT_header *gpt_hdr) {
+    GPT_partition_array* partition_array;
+    dword_t partition_table_size;
+    DAP read_context;
+    size_t li, ri;
+    GPT_partition_entry *lp, *rp;
+
+     /* Allocate struct */
+    if ((partition_array = malloc(sizeof(GPT_partition_array))) == NULL) {
+        return NULL;
+    }
+    partition_array->entry_size = gpt_hdr->entry_size;
+
+    /* Prepare DAP */
+    memset(&read_context, 0, sizeof(DAP));
+    read_context.size = sizeof(DAP);
+    read_context.segment = get_ds();
+
+    /* Calculate size of array */
+    partition_table_size = gpt_hdr->entries_count * gpt_hdr->entry_size;
+
+    /* Calculate count of sectors to read */
+    read_context.sectors = (word_t)(partition_table_size / SECTOR_SIZE + (partition_table_size % SECTOR_SIZE == 0 ? 0 : 1));
+
+    /* Allocate enough space for reading partition array */
+    if ((partition_array->array = malloc(read_context.sectors * 512)) == NULL) {
+        free(partition_array);
+        return NULL;
+    }
+
+    /* Read partition array */
+    read_context.offset = (word_t)((uintptr_t)partition_array->array);
+    read_context.lba = gpt_hdr->partition_array;
+    if(!bios_read_drive(&read_context)) {
+        free(partition_array->array);
+        free(partition_array);
+        return NULL;
+    }
+
+    /* Remove empty entries */
+    li = 0;
+    lp = partition_array->array;
+
+    while (true) {
+        /* Move left pointer to empty entry */
+        while(li < gpt_hdr->entries_count && memcmp(lp->type, null_partition_type, 16) != 0) {
+            ++li;
+            lp = (GPT_partition_entry*)(((byte_t*)lp) + partition_array->entry_size);
+        }
+
+        /* Move right pointer to the first valid entry after left pointer */
+        ri = li;
+        rp = lp;
+        while (ri < gpt_hdr->entries_count) {
+            if (memcmp(rp->type, null_partition_type, 16) != 0) {
+                break;
+            }
+            ++ri;
+            rp = (GPT_partition_entry*)(((byte_t*)rp) + partition_array->entry_size);
+        }
+
+        /* Move entry from right pointer to left pointer */
+        if (li < gpt_hdr->entries_count && ri < gpt_hdr->entries_count) {
+            memcpy(lp, rp, partition_array->entry_size);
+            memset(rp, 0, partition_array->entry_size);
+        } else {
+            break;
+        }
+    }
+    partition_array->count = li;
+
+    
+    /* Reallocate array with less size */
+    if ((partition_array->array = realloc(partition_array->array, partition_array->entry_size * partition_array->count)) == NULL) {
+        free(partition_array->array);
+        free(partition_array);
+        return NULL;
+    }
+    
+    return partition_array;
+    
+}
+
+GPT_partition_entry* find_partition(const GPT_partition_array* partition_array, const byte_t* GUID) {
+    GPT_partition_entry* partition = partition_array->array;
+    size_t count = partition_array->count;
+    while (count--) {
+        if (memcmp(partition->type, GUID, 16) == 0) {
+            return partition;
+        }
+        partition = (GPT_partition_entry*)(((byte_t*)partition) + partition_array->entry_size);
+    }
+    return NULL;
 }

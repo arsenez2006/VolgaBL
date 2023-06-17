@@ -25,10 +25,16 @@ static int print_error(const char *error_str) {
 
 void __noreturn ssl_entry(void) {
     memory_map* mem_map;
-    drive_parameteres drive_params;
+    
     GPT_header* gpt_hdr;
-    DAP read_context;
+    GPT_partition_array* partition_array;
     dword_t gpt_crc32, gpt_crc32_copy;
+
+    DAP read_context;
+    drive_parameteres drive_params;
+
+    GPT_partition_entry* tsl_partition;
+    GPT_partition_entry* kernel_partition;
 
     /* Print loading message */
     printf("Loading VLGBL...\n");
@@ -127,6 +133,24 @@ void __noreturn ssl_entry(void) {
 
     /* Save drive GUID */
     memcpy(drive_GUID, gpt_hdr->guid, 16);
+
+    /* Get partition table */
+    if((partition_array = get_partition_array(gpt_hdr)) == NULL) {
+        print_error("Failed to get partition table");
+        goto halt;
+    }
+
+    /* Find Third Stage Loader partition */
+    if ((tsl_partition = find_partition(partition_array, tsl_partition_type)) == NULL) {
+        print_error("Failed to find Third Stage Loader partition");
+        goto halt;
+    }
+
+    /* Find kernel partition */
+    if ((kernel_partition = find_partition(partition_array, kernel_partition_type)) == NULL) {
+        print_error("Failed to find kernel partition");
+        goto halt;
+    }
 
     dump_heap();
     dump_memory_map(mem_map);

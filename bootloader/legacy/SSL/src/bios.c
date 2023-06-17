@@ -1,5 +1,8 @@
 #include <bl/bios.h>
 
+/* From bootstrap.asm */
+extern byte_t _drive_number;
+
 void bios_putch(byte_t ch) {
     __asm__ volatile(
         "int $0x10"
@@ -38,4 +41,13 @@ bool bios_get_e820(dword_t* offset, dword_t buf_size, void* buffer) {
     } else {
         return true;
     }
+}
+bool bios_get_drive_parameteres(drive_parameteres* buffer) {
+    bool ret;
+    __asm__ volatile(
+        "int $0x13"
+        : "=@ccc"(ret)
+        : "a"((word_t)0x4800), "d"(_drive_number), "S"((word_t)((dword_t)buffer & 0xFFFF))
+    );
+    return !ret;
 }

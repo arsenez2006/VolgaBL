@@ -105,7 +105,7 @@ start:
     mul ebx
 
     ; Calculate size of Partition table in sectors
-    mov ebx, 512
+    mov ebx, SECTOR_SIZE
     div ebx
     or edx, edx
     jz short .skip_inc

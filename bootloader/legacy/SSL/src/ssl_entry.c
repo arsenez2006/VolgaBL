@@ -24,6 +24,7 @@ static int print_error(const char *error_str) {
 
 void __noreturn ssl_entry(void) {
     memory_map* mem_map;
+    drive_parameteres drive_params;
 
     /* Print loading message */
     printf("Loading VLGBL...\n");
@@ -68,6 +69,17 @@ void __noreturn ssl_entry(void) {
     /* Get memory map */
     if ((mem_map = get_memory_map()) == NULL) {
         print_error("Failed to get memory map");
+        goto halt;
+    }
+
+    /* Check drive logical sector size */
+    drive_params.size = sizeof(drive_parameteres);
+    if(!bios_get_drive_parameteres(&drive_params)) {
+        print_error("Failed to get drive paramteres");
+        goto halt;
+    }
+    if (drive_params.sector_size != 512) {
+        print_error("Wrong sector size, aborting");
         goto halt;
     }
 

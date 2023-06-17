@@ -7,4 +7,6 @@
 #define __check_ret             __attribute__((warn_unused_result))
 #define __align(n)              __attribute__((aligned(n)))
 
+#define SECTOR_SIZE 512
+
 #endif

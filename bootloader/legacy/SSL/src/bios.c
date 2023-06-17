@@ -59,5 +59,26 @@ bool bios_read_drive(const DAP* read_context) {
         : "=@ccc"(ret)
         : "a"((word_t)0x4200), "d"(_drive_number), "S"((word_t)((uintptr_t)read_context & 0xFFFF))
     );
+
+    /* Some BIOSes can't read more than 127 sectors */
+    if(ret && read_context->sectors == 128) {
+        DAP tmp_read_context;
+        tmp_read_context = *read_context;
+
+        /* Read first 127 sectors */
+        tmp_read_context.sectors = 127;
+        if (!bios_read_drive(&tmp_read_context)) {
+            return false;
+        }
+
+        /* Read last sector */
+        tmp_read_context.sectors = 1;
+        tmp_read_context.offset += 127 * SECTOR_SIZE;
+        if (!bios_read_drive(&tmp_read_context)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
     return !ret;
 }

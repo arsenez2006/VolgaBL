@@ -82,13 +82,13 @@ void __noreturn ssl_entry(void) {
         print_error("Failed to get drive paramteres");
         goto halt;
     }
-    if (drive_params.sector_size != 512) {
+    if (drive_params.sector_size != SECTOR_SIZE) {
         print_error("Wrong sector size, aborting");
         goto halt;
     }
 
     /* Read GPT header */
-    if ((gpt_hdr = malloc(512)) == NULL) {
+    if ((gpt_hdr = malloc(SECTOR_SIZE)) == NULL) {
         print_error("Failed to read GPT header.");
         goto halt;
     }

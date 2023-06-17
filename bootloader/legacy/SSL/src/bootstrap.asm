@@ -3,6 +3,8 @@ bits 16
 
 global __bootstrap
 global __drive_number
+global __heap
+global __heap_size
 
 extern _ssl_entry
 
@@ -16,6 +18,14 @@ align 16
 .bot:
     resb 2 * 1024
 .top:
+
+; Allocate heap
+__heap:
+align 16
+.begin:
+    resb 1024 * 32
+.end:
+
 
 ; Saved drive number
 __drive_number resb 1
@@ -42,4 +52,6 @@ __bootstrap:
 ; RODATA
 ; -------------------------------------------------------------------------------------------------
 section .rodata
-msg db "Bootstraped.",0
+; Heap size
+__heap_size:
+    dw __heap.end - __heap.begin

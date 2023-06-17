@@ -26,7 +26,7 @@ void bios_putch(byte_t ch);
 bool __check_ret bios_read_drive(const DAP* read_context);
 bool __check_ret bios_get_drive_parameteres(drive_parameteres* buffer);
 bool __check_ret bios_get_e820(dword_t* offset, word_t buf_size, void* buffer);
-bool __check_ret bios_serial_init(void);
+bool bios_serial_init(void);
 void bios_serial_putch(byte_t ch);
 
 #endif

@@ -3,6 +3,7 @@
 #include <bl/bios.h>
 #include <bl/io.h>
 #include <bl/utils.h>
+#include <bl/mem.h>
 
 /* GDT for Protected mode */
 static GDTR32 gdtr_pm;
@@ -26,7 +27,7 @@ void __noreturn ssl_entry(void) {
     printf("Loading VLGBL...\n");
 
     /* Initialize COM port */
-    (void)bios_serial_init();
+    bios_serial_init();
 
     /* Null descriptor */
     set_GDT32_entry(&gdt_pm[0], 0, 0, 0, 0);
@@ -56,6 +57,15 @@ void __noreturn ssl_entry(void) {
     
     enter_unreal(2 * sizeof(GDT32_entry));
 
+    /* Initialize allocator */
+    if(!mem_init()) {
+        print_error("Failed to initialize allocator");
+        goto halt;
+    }
+
+    mem_dump();
+
+halt:
     while(1) {
         __asm__ volatile("hlt");
     }

@@ -268,10 +268,10 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
                     arg.char_type = (char)va_arg(va, int);
                 else if (flags & FLAG_SHORT)
                     arg.short_type = (short)va_arg(va, int);
-                else if (flags & FLAG_LONG)
-                    arg.long_type = va_arg(va, long);
                 else if (flags & FLAG_LONG_LONG)
                     arg.long_long_type = va_arg(va, long long);
+                else if (flags & FLAG_LONG)
+                    arg.long_type = va_arg(va, long);
                 else if (flags & FLAG_INTMAX)
                     arg.intmax_type = va_arg(va, intmax_t);
                 else if (flags & FLAG_SIZE)
@@ -295,10 +295,10 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
                     arg.uchar_type = (unsigned char)va_arg(va, unsigned int);
                 else if (flags & FLAG_SHORT)
                     arg.ushort_type = (unsigned short)va_arg(va, unsigned int);
-                else if (flags & FLAG_LONG)
-                    arg.ulong_type = va_arg(va, unsigned long);
                 else if (flags & FLAG_LONG_LONG)
                     arg.ulong_long_type = va_arg(va, unsigned long long);
+                else if (flags & FLAG_LONG)
+                    arg.ulong_type = va_arg(va, unsigned long);
                 else if (flags & FLAG_INTMAX)
                     arg.uintmax_type = va_arg(va, uintmax_t);
                 else if (flags & FLAG_SIZE)
@@ -362,10 +362,10 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
                     *(char*)arg.ptr_type = index;
                 else if (flags & FLAG_SHORT)
                     *(short*)arg.ptr_type = index;
-                else if (flags & FLAG_LONG)
-                    *(long*)arg.ptr_type = index;
                 else if (flags & FLAG_LONG_LONG)
                     *(long long*)arg.ptr_type = index;
+                else if (flags & FLAG_LONG)
+                    *(long*)arg.ptr_type = index;
                 else if (flags & FLAG_INTMAX)
                     *(intmax_t*)arg.ptr_type = index;
                 else if (flags & FLAG_SIZE)

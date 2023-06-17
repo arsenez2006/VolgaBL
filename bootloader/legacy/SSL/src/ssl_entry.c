@@ -23,6 +23,8 @@ static int print_error(const char *error_str) {
 }
 
 void __noreturn ssl_entry(void) {
+    memory_map* mem_map;
+
     /* Print loading message */
     printf("Loading VLGBL...\n");
 
@@ -63,7 +65,14 @@ void __noreturn ssl_entry(void) {
         goto halt;
     }
 
-    mem_dump();
+    /* Get memory map */
+    if ((mem_map = get_memory_map()) == NULL) {
+        print_error("Failed to get memory map");
+        goto halt;
+    }
+
+    dump_heap();
+    dump_memory_map(mem_map);
 
 halt:
     while(1) {

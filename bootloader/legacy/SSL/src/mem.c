@@ -2,6 +2,7 @@
 #include <bl/io.h>
 #include <bl/string.h>
 #include <bl/utils.h>
+#include <bl/bios.h>
 
 /* From bootstrap.asm */
 extern char _heap;
@@ -186,7 +187,58 @@ void free(void *mem) {
     }
 }
 
-void mem_dump(void) {
+memory_map *get_memory_map(void) {
+    memory_map* mem_map;
+    memory_map_node* node;
+    dword_t offset;
+
+    /* Allocate struct */
+    if ((mem_map = malloc(sizeof(memory_map))) == NULL) {
+        return NULL;
+    }
+
+    /* Allocate first node */
+    if ((node = malloc(sizeof(memory_map_node))) == NULL) {
+        free(mem_map);
+        return NULL;
+    }
+    memset(node, 0, sizeof(memory_map_node));
+    mem_map->list = node;
+    mem_map->count = 1;
+
+    /* Get memory map */
+    offset = 0;
+    do {
+        if (!bios_get_e820(&offset, sizeof(memory_map_entry), &node->entry)) {
+            while(node->prev) {
+                node = node->prev;
+                free(node->next);
+            }
+            free(node);
+            free(mem_map);
+            return NULL;
+        }
+        if (offset != 0) {
+            if((node->next = malloc(sizeof(memory_map_node))) == NULL) {
+                while(node->prev) {
+                    node = node->prev;
+                    free(node->next);
+                }
+                free(node);
+                free(mem_map);
+                return NULL;
+            }
+            memset(node->next, 0, sizeof(memory_map_node));
+            node->next->prev = node;
+            node = node->next;
+            ++mem_map->count;
+        }
+    } while(offset != 0);
+
+    return mem_map;
+}
+
+void dump_heap(void) {
     size_t block_index = 0;
     _block_hdr* block;
     
@@ -217,5 +269,16 @@ void mem_dump(void) {
             (void*)block->prev,
             (void*)block->next
         );
+    }
+}
+
+void dump_memory_map(memory_map *mem_map) {
+    memory_map_node *node = mem_map->list;
+    while (node) {
+        serial_printf(
+            "Base address = %#.16llx, Limit = %#.16llx, Type = %d, ACPI = %d\n",
+            node->entry.base, node->entry.limit, node->entry.type, node->entry.ACPI
+        );
+        node = node->next;
     }
 }

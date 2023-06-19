@@ -14,7 +14,7 @@ SECTIONS
     } > SSL_segment
     .rodata :
     {
-        *(.rodata)
+        *(.rodata*)
     } > SSL_segment
     .data :
     {

@@ -140,6 +140,10 @@ uint64_t __divmoddi4(uint64_t a, uint64_t b, uint64_t *c) {
     return (a << 1) | (wrap & 1);
 }
 
+uint64_t __udivmoddi4(uint64_t a, uint64_t b, uint64_t *c) {
+    return __divmoddi4(a, b, c);
+}
+
 int64_t __divdi3(int64_t a, int64_t b) {
     uint64_t q = __divmoddi4(_abs(a), _abs(b), (void *)0);
     return _neg(q, a ^ b);

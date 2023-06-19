@@ -1,5 +1,4 @@
-# Flags for 8086 target
-list(APPEND C_8086_DIALECT 
+list(APPEND C_DIALECT 
     "-Wall"
     "-Wpedantic" 
     "-Wno-long-long"
@@ -7,13 +6,13 @@ list(APPEND C_8086_DIALECT
     "-fno-builtin" 
     "-ffreestanding" 
 )
-list(APPEND C_8086_OPTIMIZATION 
+list(APPEND C_OPTIMIZATION 
     ""
 )
-list(APPEND C_8086_INSTRUMENTATION 
+list(APPEND C_INSTRUMENTATION 
     "-fno-stack-protector"
 )
-list(APPEND C_8086_GENERATION 
+list(APPEND C_GENERATION 
     "-freg-struct-return"
     "-fverbose-asm"
     "-fno-pic"
@@ -22,18 +21,25 @@ list(APPEND C_8086_GENERATION
     "-fno-asynchronous-unwind-tables"
     "-fno-common"
 )
-list(APPEND C_8086_x86
+list(APPEND C_x86_16
     "-march=i386"
     "-mregparm=3"
-    "-mpreferred-stack-boundary=2"
+    "-mpreferred-stack-boundary=3"
     "-mabi=sysv"
     "-mgeneral-regs-only"
     "-m16"
 )
-set(C_8086_FLAGS ${C_8086_DIALECT} ${C_8086_OPTIMIZATION} ${C_8086_INSTRUMENTATION} ${C_8086_GENERATION} ${C_8086_x86})
-set(ASM_8086_FLAGS "-Ox -f elf32")
-list(APPEND LINK_8086_FLAGS 
-    ${C_8086_FLAGS}
+
+list(APPEND C_x86_32
+    "-march=i686"
+    "-mregparm=3"
+    "-mpreferred-stack-boundary=3"
+    "-mabi=sysv"
+    "-mgeneral-regs-only"
+    "-m32"
+)
+
+list(APPEND LINK_FLAGS 
     "-nostartfiles"
     "-nodefaultlibs"
     "-nolibc"
@@ -41,3 +47,13 @@ list(APPEND LINK_8086_FLAGS
     "-s"
     "-static"
 )
+
+# Flags for 16bit target
+set(ASM_FLAGS_16 "-Ox -f elf32")
+set(C_FLAGS_16 ${C_DIALECT} ${C_OPTIMIZATION} ${C_INSTRUMENTATION} ${C_GENERATION} ${C_x86_16})
+set(LINK_FLAGS_16 ${C_FLAGS_16} ${LINK_FLAGS})
+
+# Flags for 32bit target
+set(ASM_FLAGS_32 "-Ox -f elf32")
+set(C_FLAGS_32 ${C_DIALECT} ${C_OPTIMIZATION} ${C_INSTRUMENTATION} ${C_GENERATION} ${C_x86_32})
+set(LINK_FLAGS_32 ${C_FLAGS_32} ${LINK_FLAGS})

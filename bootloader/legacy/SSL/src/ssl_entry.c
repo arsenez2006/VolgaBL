@@ -152,8 +152,54 @@ void __noreturn ssl_entry(void) {
         goto halt;
     }
 
+    /* Load Third Stage Loader */
+    read_context.segment = TSL_SEG;
+    read_context.offset = 0x0000;
+    read_context.sectors = tsl_partition->end_lba - tsl_partition->start_lba + 1;
+    read_context.lba = tsl_partition->start_lba;
+    if(!bios_read_drive(&read_context)) {
+        print_error("Failed to load Third Stage Loader");
+        goto halt;
+    }
+
     dump_heap();
     dump_memory_map(mem_map);
+
+    /* Finalize Second Stage Loader */
+    __asm__ volatile(
+        "cli\n"
+        "movb $0xFF, %%al\n"        /* Disable PIC */
+        "outb %%al, $0xA1\n"
+        "outb %%al, $0x21\n"
+
+        "movl %%cr0, %%eax\n"       /* Set CR0 PE bit */
+        "orb $1, %%al\n"
+        "movl %%eax, %%cr0\n"
+
+        "jmp .pm\n"                 /* Clear instruction pipeline */
+        ".pm:\n"
+
+        "movw %[data_seg], %%ax\n"  /* Set 32bit segments */
+        "movw %%ax, %%ds\n"
+        "movw %%ax, %%es\n"
+        "movw %%ax, %%ss\n"
+        "movw %%ax, %%fs\n"
+        "movw %%ax, %%gs\n"
+
+        "xorl %%eax, %%eax\n"       /* Fix stack pointer */
+        "movw %%cs, %%ax\n"
+        "shll $4, %%eax\n"
+        "andl $0xFFFF, %%esp\n"
+        "addl %%eax, %%esp\n"
+
+        "movb $0xE9, (0x0000)\n"    /* Make jump stub */
+        "movl %[jmp_addr], (0x0001)\n"
+
+        "ljmp %[code_seg],$0x0000"  /* Jump to Third Stage Loader */
+        :
+        : [data_seg] "rmN"((word_t)2 * sizeof(GDT32_entry)), [jmp_addr] "rmN"((dword_t)TSL_ADDR), [code_seg] "N"((word_t)1 * sizeof(GDT32_entry))
+        : "eax"
+    );
 
 halt:
     while(1) {

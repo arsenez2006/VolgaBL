@@ -9,4 +9,7 @@
 
 #define SECTOR_SIZE 512
 
+#define TSL_ADDR    0x20000
+#define TSL_SEG     TSL_ADDR >> 4
+
 #endif

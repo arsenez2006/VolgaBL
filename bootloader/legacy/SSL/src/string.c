@@ -1,13 +1,22 @@
+/**
+ * @file string.c
+ * @author Arseny Lashkevich (arsenez@cybercommunity.space)
+ * @brief Functions for manipulating c-strings and buffers
+ *
+ */
 #include <bl/string.h>
 
-size_t strlen(const char *start) {
+size_t
+strlen(const char* start) {
     const char* end;
-    for (end = start; *end != '\0'; ++end);
+    for (end = start; *end != '\0'; ++end)
+        ;
     return end - start;
 }
 
-int memcmp(const void *lhs, const void *rhs, size_t count) {
-    while(count--) {
+int
+memcmp(const void* lhs, const void* rhs, size_t count) {
+    while (count--) {
         if (*(byte_t*)lhs != *(byte_t*)rhs) {
             return (uintptr_t)lhs - (uintptr_t)rhs;
         }
@@ -17,7 +26,8 @@ int memcmp(const void *lhs, const void *rhs, size_t count) {
     return 0;
 }
 
-void* memcpy(void *dest, const void *src, size_t count) {
+void*
+memcpy(void* dest, const void* src, size_t count) {
     size_t i;
     for (i = 0; i < count; ++i) {
         ((byte_t*)dest)[i] = ((byte_t*)src)[i];
@@ -25,9 +35,10 @@ void* memcpy(void *dest, const void *src, size_t count) {
     return dest;
 }
 
-void* memset(void* ptr, int val, size_t count) {
+void*
+memset(void* ptr, int val, size_t count) {
     byte_t* data = (byte_t*)ptr;
-    while(count--) {
+    while (count--) {
         *data++ = (byte_t)val;
     }
     return ptr;

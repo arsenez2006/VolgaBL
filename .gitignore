@@ -3,5 +3,6 @@
 .cache
 .clangd
 build
+docs
 *.sh
 *.bin

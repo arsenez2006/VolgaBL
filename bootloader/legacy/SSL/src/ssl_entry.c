@@ -1,3 +1,9 @@
+/**
+ * @file ssl_entry.c
+ * @author Arseny Lashkevich (arsenez@cybercommunity.space)
+ * @brief Second Stage Loader entry
+ *
+ */
 #include <bl/bios.h>
 #include <bl/defines.h>
 #include <bl/io.h>
@@ -27,28 +33,26 @@ static const byte_t tsl_partition_type[] = {
  * @param error_str Error message
  */
 static void
-print_error(const char* error_str)
-{
+print_error(const char* error_str) {
     printf("VLGBL Error: %s\n", error_str);
 }
 
 /**
  * @brief Second Stage Loader entry
  *
- * `Second Stage Loader` (SSL) works in Real Mode, so it can use BIOS interface.
- * SSL goals are:
- * - Load `Third Stage Loader` and kernel partitions to memory
- * - Get GUID of the booted drive
- * - Get memory map
- * - // TODO: Get video modes
- * - // TODO: Enable graphics mode
- * - // TODO: Enable A20
- * - Enable Protected Mode
- * - Run `Third Stage Loader`
+ * @details `Second Stage Loader` (SSL) works in Real Mode, so it can use BIOS interface.\n
+ *          SSL goals are:\n
+ *          - Load `Third Stage Loader` and kernel partitions to memory
+ *          - Get GUID of the booted drive
+ *          - Get memory map
+ *          - // TODO: Get video modes
+ *          - // TODO: Enable graphics mode
+ *          - // TODO: Enable A20
+ *          - Enable Protected Mode
+ *          - Run `Third Stage Loader`
  */
 void __noreturn
-ssl_entry(void)
-{
+ssl_entry(void) {
     memory_map* mem_map;
 
     GPT_header* gpt_hdr;

@@ -35,5 +35,10 @@ add_custom_target(remap
     COMMAND ${SFDISK} ${OUT_ISO} < ${PROJECT_SOURCE_DIR}/disk_layout.map
 )
 
+# Target for buiilding docs
+add_custom_target(docs
+    COMMAND doxygen ${PROJECT_SOURCE_DIR}/Doxyfile
+)
+
 # Compile bootloader
 add_subdirectory(bootloader/legacy)

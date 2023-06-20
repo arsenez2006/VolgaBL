@@ -46,6 +46,7 @@ __bootstrap:
     mov byte [__drive_number], dl ; Save drive number
     sti
 
+    ; Call C Code
     jmp near _ssl_entry
 
 ; -------------------------------------------------------------------------------------------------

@@ -6,8 +6,13 @@
  */
 #include <bl/bios.h>
 
+/* Leave this undocument */
+#ifndef DOX_SKIP
+
 /* From bootstrap.asm */
 extern byte_t _drive_number;
+
+#endif
 
 bool
 bios_serial_init(void) {

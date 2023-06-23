@@ -78,7 +78,7 @@ _merge_blocks(_block_hdr* up, _block_hdr* down) {
     return up;
 }
 
-#endif
+#endif /* DOX_SKIP */
 
 bool
 mem_init(void) {
@@ -307,5 +307,5 @@ _dump_memory_map(memory_map* mem_map) {
     }
 }
 
-#endif
-#endif
+#endif /* NDEBUG */
+#endif /* DOX_SKIP */

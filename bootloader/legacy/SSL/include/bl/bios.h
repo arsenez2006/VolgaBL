@@ -146,4 +146,4 @@ bios_serial_init(void);
 void
 bios_serial_putch(byte_t ch);
 
-#endif
+#endif /* BL_BIOS_H */

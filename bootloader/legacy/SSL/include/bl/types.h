@@ -13,7 +13,7 @@ typedef uint64_t qword_t;
 #ifndef __bool_true_false_are_defined
 #define __bool_true_false_are_defined
 typedef enum { false, true } bool;
-#endif
+#endif /* __bool_true_false_are_defined */
 
 typedef struct __packed _memory_map_entry {
     qword_t base;
@@ -92,4 +92,4 @@ typedef struct __packed _GDTR32 {
     byte_t data[6];
 } GDTR32;
 
-#endif
+#endif /* BL_TYPES_H */

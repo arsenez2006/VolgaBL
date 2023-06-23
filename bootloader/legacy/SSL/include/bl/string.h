@@ -45,4 +45,4 @@ memcpy(void* dest, const void* src, size_t count);
 void*
 memset(void* ptr, int val, size_t count);
 
-#endif
+#endif /* BL_STRING_H */

@@ -12,7 +12,7 @@
 /* From bootstrap.asm */
 extern byte_t _drive_number;
 
-#endif
+#endif /* DOX_SKIP */
 
 bool
 bios_serial_init(void) {

@@ -21,6 +21,6 @@ GPT_partition_entry* find_partition(const GPT_partition_array* partition_array, 
 #else
     #define dump_heap()                 do { continue; } while(0)
     #define dump_memory_map(mem_map)    do { continue; } while(0)
-#endif
+#endif /* NDEBUG */
 
-#endif
+#endif /* BL_UTILS_H */

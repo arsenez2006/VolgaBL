@@ -1,56 +1,94 @@
-#include <bl/io.h>
+/**
+ * @file io.c
+ * @author Arseny Lashkevich (arsenez@cybercommunity.space)
+ * @brief Implements printf
+ *
+ */
 #include <bl/bios.h>
+#include <bl/io.h>
 #include <bl/string.h>
 
+/* Leave this undocumented */
+#ifndef DOX_SKIP
+
+/* Write function prototype */
 typedef void (*buffer_fcn)(void* buffer, size_t max_size, size_t index, char ch);
 
-static void _buffer_mem(void* buffer, size_t max_size, size_t index, char ch) {
+/* Write to memory buffer */
+static void
+_buffer_mem(void* buffer, size_t max_size, size_t index, char ch) {
     if (index < max_size)
         ((char*)buffer)[index] = ch;
 }
 
-static void _buffer_out(void* buffer, size_t max_size, size_t index, char ch) {
-    (void)buffer; (void)max_size; (void)index;
-    
+/* Write to terminal */
+static void
+_buffer_out(void* buffer, size_t max_size, size_t index, char ch) {
+    (void)buffer;
+    (void)max_size;
+    (void)index;
+
     if (ch == '\n') {
-        bios_putch('\r'); bios_putch('\n');
+        bios_putch('\r');
+        bios_putch('\n');
     } else if (ch != '\0') {
         bios_putch(ch);
     }
 }
 
-static void _buffer_serial(void* buffer, size_t max_size, size_t index, char ch) {
-    (void)buffer; (void)max_size; (void)index;
+/* Write to COM port */
+static void
+_buffer_serial(void* buffer, size_t max_size, size_t index, char ch) {
+    (void)buffer;
+    (void)max_size;
+    (void)index;
 
     if (ch == '\n') {
-        bios_serial_putch('\r'); bios_serial_putch('\n');
+        bios_serial_putch('\r');
+        bios_serial_putch('\n');
     } else {
         bios_serial_putch(ch);
     }
 }
 
-static void _buffer_null(void* buffer, size_t max_size, size_t index, char ch) {
-    (void)buffer; (void)max_size; (void)index; (void)ch;
+/* Don't write */
+static void
+_buffer_null(void* buffer, size_t max_size, size_t index, char ch) {
+    (void)buffer;
+    (void)max_size;
+    (void)index;
+    (void)ch;
 }
 
-#define FLAG_LEFT       (1U << 0)
-#define FLAG_SIGN       (1U << 1)
-#define FLAG_SPACE      (1U << 2)
-#define FLAG_HASH       (1U << 3)
-#define FLAG_ZERO       (1U << 4)
+/* Format flags */
+#define FLAG_LEFT (1U << 0)
+#define FLAG_SIGN (1U << 1)
+#define FLAG_SPACE (1U << 2)
+#define FLAG_HASH (1U << 3)
+#define FLAG_ZERO (1U << 4)
 
-#define FLAG_PRECISION  (1U << 5)
+/* Precision flag */
+#define FLAG_PRECISION (1U << 5)
 
-#define FLAG_CHAR       (1U << 6)
-#define FLAG_SHORT      (1U << 7)
-#define FLAG_LONG       (1U << 8)
-#define FLAG_LONG_LONG  (1U << 9)
-#define FLAG_SIZE       (1U << 10)
-#define FLAG_PTRDIFF    (1U << 11)
-#define FLAG_INTMAX     (1U << 12)
+/* Size flags */
+#define FLAG_CHAR (1U << 6)
+#define FLAG_SHORT (1U << 7)
+#define FLAG_LONG (1U << 8)
+#define FLAG_LONG_LONG (1U << 9)
+#define FLAG_SIZE (1U << 10)
+#define FLAG_PTRDIFF (1U << 11)
+#define FLAG_INTMAX (1U << 12)
 
-static size_t _format_output(buffer_fcn write, void* buffer, size_t max_size, size_t index, const char* output, size_t output_size, uint16_t flags, uint16_t width)
-{
+/* Writes formatted output */
+static size_t
+_format_output(buffer_fcn write,
+               void* buffer,
+               size_t max_size,
+               size_t index,
+               const char* output,
+               size_t output_size,
+               uint16_t flags,
+               uint16_t width) {
     size_t i;
     char fill = flags & FLAG_ZERO ? '0' : ' ';
 
@@ -66,14 +104,15 @@ static size_t _format_output(buffer_fcn write, void* buffer, size_t max_size, si
             write(buffer, max_size, index++, fill);
     } else {
         /* Right-Justification */
-        
-        /* Calculate fill size, assuming width is unsigned (if output_size > width then output_size - width will be incorrect) */
+
+        /* Calculate fill size, assuming width is unsigned (if output_size > width then output_size
+         * - width will be incorrect) */
         width = width < output_size ? 0 : width - output_size;
 
         /* Pad if calculated fill size > 0 */
         for (i = 0U; i < width; ++i)
             write(buffer, max_size, index++, fill);
-        
+
         /* Write output string */
         for (i = 0U; i < output_size; ++i)
             write(buffer, max_size, index++, *output++);
@@ -82,22 +121,32 @@ static size_t _format_output(buffer_fcn write, void* buffer, size_t max_size, si
     return index;
 }
 
-static void _reverse(char* buff, size_t buff_size) {
+/* Reverse string */
+static void
+_reverse(char* buff, size_t buff_size) {
     size_t i, j;
     char c;
 
-    for (i = 0, j = buff_size - 1; i < j; ++i, --j)
-    {
+    for (i = 0, j = buff_size - 1; i < j; ++i, --j) {
         c = buff[i];
         buff[i] = buff[j];
         buff[j] = c;
     }
 }
 
+/* Hexademical ASCII alphabet */
 static char hcase_alphabet[] = "0123456789ABCDEF";
 static char lcase_alphabet[] = "0123456789abcdef";
 
-static size_t _ntoa(uintmax_t num, bool negative, uint8_t radix, char* num_buffer, uint16_t flags, uint16_t precision, bool hcase) {
+/* Converts number to formatted string */
+static size_t
+_ntoa(uintmax_t num,
+      bool negative,
+      uint8_t radix,
+      char* num_buffer,
+      uint16_t flags,
+      uint16_t precision,
+      bool hcase) {
     size_t index = 0U;
 
     /* Write digits in reverse sequence */
@@ -133,28 +182,30 @@ static size_t _ntoa(uintmax_t num, bool negative, uint8_t radix, char* num_buffe
     return index;
 }
 
-static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer_fcn write) {
+/* Internal vsnprintf */
+static int
+_vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer_fcn write) {
     size_t index = 0U, num_size;
     uint16_t flags, width, precision;
     bool flags_loop;
     uint8_t radix;
     char num_buffer[32];
-    union { 
-        char                char_type;
-        unsigned char       uchar_type;
-        short               short_type;
-        unsigned short      ushort_type;
-        int                 int_type;
-        unsigned int        uint_type;
-        long                long_type;
-        unsigned long       ulong_type;
-        long long           long_long_type;
-        unsigned long long  ulong_long_type;
-        size_t              size_type;
-        ptrdiff_t           ptrdiff_type;
-        intmax_t            intmax_type;
-        uintmax_t           uintmax_type;
-        uintptr_t           ptr_type;
+    union {
+        char char_type;
+        unsigned char uchar_type;
+        short short_type;
+        unsigned short ushort_type;
+        int int_type;
+        unsigned int uint_type;
+        long long_type;
+        unsigned long ulong_type;
+        long long long_long_type;
+        unsigned long long ulong_long_type;
+        size_t size_type;
+        ptrdiff_t ptrdiff_type;
+        intmax_t intmax_type;
+        uintmax_t uintmax_type;
+        uintptr_t ptr_type;
     } arg;
 
     if (!buffer)
@@ -171,28 +222,28 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
             flags_loop = true;
             while (flags_loop) {
                 switch (*format) {
-                case '-':
-                    flags |= FLAG_LEFT;
-                    format++;
-                break;
-                case '+':
-                    flags |= FLAG_SIGN;
-                    format++;
-                break;
-                case ' ':
-                    flags |= FLAG_SPACE;
-                    format++;
-                break;
-                case '#':
-                    flags |= FLAG_HASH;
-                    format++;
-                break;
-                case '0':
-                    flags |= FLAG_ZERO;
-                    format++;
-                break;
-                default:
-                    flags_loop = false;
+                    case '-':
+                        flags |= FLAG_LEFT;
+                        format++;
+                        break;
+                    case '+':
+                        flags |= FLAG_SIGN;
+                        format++;
+                        break;
+                    case ' ':
+                        flags |= FLAG_SPACE;
+                        format++;
+                        break;
+                    case '#':
+                        flags |= FLAG_HASH;
+                        format++;
+                        break;
+                    case '0':
+                        flags |= FLAG_ZERO;
+                        format++;
+                        break;
+                    default:
+                        flags_loop = false;
                 }
             }
 
@@ -229,159 +280,184 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
 
             /* Parse length */
             switch (*format) {
-            case 'h':
-                flags |= FLAG_SHORT;
-                format++;
-                if (*format == 'h') {
-                    flags |= FLAG_CHAR;
+                case 'h':
+                    flags |= FLAG_SHORT;
                     format++;
-                }
-            break;
-            case 'l':
-                flags |= FLAG_LONG;
-                format++;
-                if (*format == 'l') {
-                    flags |= FLAG_LONG_LONG;
+                    if (*format == 'h') {
+                        flags |= FLAG_CHAR;
+                        format++;
+                    }
+                    break;
+                case 'l':
+                    flags |= FLAG_LONG;
                     format++;
-                }
-            break;
-            case 'j':
-                flags |= FLAG_INTMAX;
-                format++;
-            break;
-            case 'z':
-                flags |= FLAG_SIZE;
-                format++;
-            break;
-            case 't':
-                flags |= FLAG_PTRDIFF;
-                format++;
-            break;
+                    if (*format == 'l') {
+                        flags |= FLAG_LONG_LONG;
+                        format++;
+                    }
+                    break;
+                case 'j':
+                    flags |= FLAG_INTMAX;
+                    format++;
+                    break;
+                case 'z':
+                    flags |= FLAG_SIZE;
+                    format++;
+                    break;
+                case 't':
+                    flags |= FLAG_PTRDIFF;
+                    format++;
+                    break;
             }
 
             /* Parse specifier and format output */
             switch (*format) {
-            case 'i':
-            case 'd': {
-                arg.intmax_type = 0U;
-                if (flags & FLAG_CHAR)
-                    arg.char_type = (char)va_arg(va, int);
-                else if (flags & FLAG_SHORT)
-                    arg.short_type = (short)va_arg(va, int);
-                else if (flags & FLAG_LONG_LONG)
-                    arg.long_long_type = va_arg(va, long long);
-                else if (flags & FLAG_LONG)
-                    arg.long_type = va_arg(va, long);
-                else if (flags & FLAG_INTMAX)
-                    arg.intmax_type = va_arg(va, intmax_t);
-                else if (flags & FLAG_SIZE)
-                    arg.size_type = va_arg(va, size_t);
-                else if (flags & FLAG_PTRDIFF)
-                    arg.ptrdiff_type = va_arg(va, ptrdiff_t);
-                else
-                    arg.int_type = va_arg(va, int);
+                case 'i':
+                case 'd': {
+                    arg.intmax_type = 0U;
+                    if (flags & FLAG_CHAR)
+                        arg.char_type = (char)va_arg(va, int);
+                    else if (flags & FLAG_SHORT)
+                        arg.short_type = (short)va_arg(va, int);
+                    else if (flags & FLAG_LONG_LONG)
+                        arg.long_long_type = va_arg(va, long long);
+                    else if (flags & FLAG_LONG)
+                        arg.long_type = va_arg(va, long);
+                    else if (flags & FLAG_INTMAX)
+                        arg.intmax_type = va_arg(va, intmax_t);
+                    else if (flags & FLAG_SIZE)
+                        arg.size_type = va_arg(va, size_t);
+                    else if (flags & FLAG_PTRDIFF)
+                        arg.ptrdiff_type = va_arg(va, ptrdiff_t);
+                    else
+                        arg.int_type = va_arg(va, int);
 
-                num_size = _ntoa(arg.intmax_type < 0 ? -arg.intmax_type : arg.intmax_type, arg.intmax_type < 0, 10, num_buffer, flags, precision, false);
-                index = _format_output(write, num_buffer, max_size, index, num_buffer, num_size, flags, width);
+                    num_size = _ntoa(arg.intmax_type < 0 ? -arg.intmax_type : arg.intmax_type,
+                                     arg.intmax_type < 0,
+                                     10,
+                                     num_buffer,
+                                     flags,
+                                     precision,
+                                     false);
+                    index = _format_output(
+                      write, num_buffer, max_size, index, num_buffer, num_size, flags, width);
 
-                format++;
-            } break;
-            case 'u':
-            case 'o':
-            case 'x':
-            case 'X': {
-                arg.uintmax_type = 0U;
-                if (flags & FLAG_CHAR)
-                    arg.uchar_type = (unsigned char)va_arg(va, unsigned int);
-                else if (flags & FLAG_SHORT)
-                    arg.ushort_type = (unsigned short)va_arg(va, unsigned int);
-                else if (flags & FLAG_LONG_LONG)
-                    arg.ulong_long_type = va_arg(va, unsigned long long);
-                else if (flags & FLAG_LONG)
-                    arg.ulong_type = va_arg(va, unsigned long);
-                else if (flags & FLAG_INTMAX)
-                    arg.uintmax_type = va_arg(va, uintmax_t);
-                else if (flags & FLAG_SIZE)
-                    arg.size_type = va_arg(va, size_t);
-                else if (flags & FLAG_PTRDIFF)
-                    arg.ptrdiff_type = va_arg(va, ptrdiff_t);
-                else
-                    arg.uint_type = va_arg(va, unsigned int);
-
-                switch (*format) {
+                    format++;
+                } break;
                 case 'u':
-                    radix = 10;
-                break;
                 case 'o':
-                    radix = 8;
-                break;
                 case 'x':
-                case 'X':
-                    radix = 16;
-                break;
-                }
+                case 'X': {
+                    arg.uintmax_type = 0U;
+                    if (flags & FLAG_CHAR)
+                        arg.uchar_type = (unsigned char)va_arg(va, unsigned int);
+                    else if (flags & FLAG_SHORT)
+                        arg.ushort_type = (unsigned short)va_arg(va, unsigned int);
+                    else if (flags & FLAG_LONG_LONG)
+                        arg.ulong_long_type = va_arg(va, unsigned long long);
+                    else if (flags & FLAG_LONG)
+                        arg.ulong_type = va_arg(va, unsigned long);
+                    else if (flags & FLAG_INTMAX)
+                        arg.uintmax_type = va_arg(va, uintmax_t);
+                    else if (flags & FLAG_SIZE)
+                        arg.size_type = va_arg(va, size_t);
+                    else if (flags & FLAG_PTRDIFF)
+                        arg.ptrdiff_type = va_arg(va, ptrdiff_t);
+                    else
+                        arg.uint_type = va_arg(va, unsigned int);
 
-                num_size = _ntoa(arg.uintmax_type, false, radix, num_buffer, flags, precision, *format == 'X' ? true : false);
-                index = _format_output(write, buffer, max_size, index, num_buffer, num_size, flags, width);
+                    switch (*format) {
+                        case 'u':
+                            radix = 10;
+                            break;
+                        case 'o':
+                            radix = 8;
+                            break;
+                        case 'x':
+                        case 'X':
+                            radix = 16;
+                            break;
+                    }
 
-                format++;
-            } break;
-            case 'c': {
-                arg.intmax_type = 0U;
-                if (flags & FLAG_LONG)
-                    /* WINT_T won't be implemented */;
-                else
-                    arg.int_type = va_arg(va, int);
-                
-                index = _format_output(write, buffer, max_size, index, (const char*)&arg.int_type, 1, flags, width);
+                    num_size = _ntoa(arg.uintmax_type,
+                                     false,
+                                     radix,
+                                     num_buffer,
+                                     flags,
+                                     precision,
+                                     *format == 'X' ? true : false);
+                    index = _format_output(
+                      write, buffer, max_size, index, num_buffer, num_size, flags, width);
 
-                format++;
-            } break;
-            case 's': {
-                arg.ptr_type = (uintptr_t)va_arg(va, void*);
-                if (flags & FLAG_LONG)
-                    /* WCHAR_T won't be implemented */;
-                else
-                    index = _format_output(write, buffer, max_size, index, (const char*)arg.ptr_type, strlen((const char*)arg.ptr_type), flags, width);
-                
-                format++;
-            } break;
-            case 'p': {
-                arg.uintmax_type = 0U;
-                arg.ptr_type = (uintptr_t)va_arg(va, void*);
+                    format++;
+                } break;
+                case 'c': {
+                    arg.intmax_type = 0U;
+                    if (flags & FLAG_LONG)
+                        /* WINT_T won't be implemented */;
+                    else
+                        arg.int_type = va_arg(va, int);
 
-                flags |= FLAG_HASH;
-                num_size = _ntoa(arg.uintmax_type, false, 16, num_buffer, flags, precision, false);
-                index = _format_output(write, buffer, max_size, index, num_buffer, num_size, flags, width);
+                    index = _format_output(
+                      write, buffer, max_size, index, (const char*)&arg.int_type, 1, flags, width);
 
-                format++;
-            } break;
-            case 'n': {
-                arg.ptr_type = (uintptr_t)va_arg(va, void*);
-                if (flags & FLAG_CHAR)
-                    *(char*)arg.ptr_type = index;
-                else if (flags & FLAG_SHORT)
-                    *(short*)arg.ptr_type = index;
-                else if (flags & FLAG_LONG_LONG)
-                    *(long long*)arg.ptr_type = index;
-                else if (flags & FLAG_LONG)
-                    *(long*)arg.ptr_type = index;
-                else if (flags & FLAG_INTMAX)
-                    *(intmax_t*)arg.ptr_type = index;
-                else if (flags & FLAG_SIZE)
-                    *(size_t*)arg.ptr_type = index;
-                else if (flags & FLAG_PTRDIFF)
-                    *(ptrdiff_t*)arg.ptr_type = index;
-                else
-                    *(int*)arg.ptr_type = index;
-                
-                format++;
-            } break;
-            case '%': {
-                index = _format_output(write, buffer, max_size, index, format++, 1, flags, width);
-            } break;
-            default:
-                format++;
+                    format++;
+                } break;
+                case 's': {
+                    arg.ptr_type = (uintptr_t)va_arg(va, void*);
+                    if (flags & FLAG_LONG)
+                        /* WCHAR_T won't be implemented */;
+                    else
+                        index = _format_output(write,
+                                               buffer,
+                                               max_size,
+                                               index,
+                                               (const char*)arg.ptr_type,
+                                               strlen((const char*)arg.ptr_type),
+                                               flags,
+                                               width);
+
+                    format++;
+                } break;
+                case 'p': {
+                    arg.uintmax_type = 0U;
+                    arg.ptr_type = (uintptr_t)va_arg(va, void*);
+
+                    flags |= FLAG_HASH;
+                    num_size =
+                      _ntoa(arg.uintmax_type, false, 16, num_buffer, flags, precision, false);
+                    index = _format_output(
+                      write, buffer, max_size, index, num_buffer, num_size, flags, width);
+
+                    format++;
+                } break;
+                case 'n': {
+                    arg.ptr_type = (uintptr_t)va_arg(va, void*);
+                    if (flags & FLAG_CHAR)
+                        *(char*)arg.ptr_type = index;
+                    else if (flags & FLAG_SHORT)
+                        *(short*)arg.ptr_type = index;
+                    else if (flags & FLAG_LONG_LONG)
+                        *(long long*)arg.ptr_type = index;
+                    else if (flags & FLAG_LONG)
+                        *(long*)arg.ptr_type = index;
+                    else if (flags & FLAG_INTMAX)
+                        *(intmax_t*)arg.ptr_type = index;
+                    else if (flags & FLAG_SIZE)
+                        *(size_t*)arg.ptr_type = index;
+                    else if (flags & FLAG_PTRDIFF)
+                        *(ptrdiff_t*)arg.ptr_type = index;
+                    else
+                        *(int*)arg.ptr_type = index;
+
+                    format++;
+                } break;
+                case '%': {
+                    index =
+                      _format_output(write, buffer, max_size, index, format++, 1, flags, width);
+                } break;
+                default:
+                    format++;
             }
         }
     }
@@ -391,11 +467,15 @@ static int _vsnprintf(void* buffer, size_t max_size, const char* format, va_list
     return index;
 }
 
-int vsnprintf(char *s, size_t n, const char *format, va_list arg) {
+#endif /* DOX_SKIP */
+
+int
+vsnprintf(char* s, size_t n, const char* format, va_list arg) {
     return _vsnprintf(s, n, format, arg, _buffer_mem);
 }
 
-int snprintf(char *s, size_t n, const char *format, ...) {
+int
+snprintf(char* s, size_t n, const char* format, ...) {
     va_list va;
     int ret;
 
@@ -406,7 +486,8 @@ int snprintf(char *s, size_t n, const char *format, ...) {
     return ret;
 }
 
-int sprintf(char *s, const char *format, ...) {
+int
+sprintf(char* s, const char* format, ...) {
     va_list va;
     int ret;
 
@@ -417,7 +498,8 @@ int sprintf(char *s, const char *format, ...) {
     return ret;
 }
 
-int printf(const char *format, ...) {
+int
+printf(const char* format, ...) {
     va_list va;
     char buffer[1];
     int ret;
@@ -429,7 +511,8 @@ int printf(const char *format, ...) {
     return ret;
 }
 
-int serial_printf(const char* format, ...) {
+int
+serial_printf(const char* format, ...) {
     va_list va;
     char buffer[1];
     int ret;

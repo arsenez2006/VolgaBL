@@ -47,4 +47,4 @@ free(void* mem);
 memory_map*
 get_memory_map(void);
 
-#endif
+#endif /* BL_MEM_H */

@@ -1,3 +1,9 @@
+/**
+ * @file bios.h
+ * @author Arseny Lashkevich (arsenez@cybercommunity.space)
+ * @brief Useful BIOS call wrappers for C
+ * 
+ */
 #ifndef BL_BIOS_H
 #define BL_BIOS_H
 
@@ -7,6 +13,9 @@
  * @struct DAP
  * @brief Disk Address Packet
  * @details Used by BIOS int 13h for reading/writing drive
+ *
+ * @typedef DAP
+ * @brief DAP type
  *
  */
 typedef struct __packed DAP {
@@ -46,6 +55,10 @@ typedef struct __packed DAP {
  * @struct drive_parameteres
  * @brief Parameteres of the drive
  * @details Used by BIOS int 13h to get drive parameteres
+ *
+ * @typedef drive_parameteres
+ * @brief drive_parameteres type
+ * 
  */
 typedef struct __packed drive_parameteres {
     /**

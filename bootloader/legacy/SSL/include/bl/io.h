@@ -1,3 +1,9 @@
+/**
+ * @file io.h
+ * @author Arseny Lashkevich (arsenez@cybercommunity.space)
+ * @brief Implements printf
+ * 
+ */
 #ifndef BL_IO_H
 #define BL_IO_H
 

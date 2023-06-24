@@ -65,6 +65,125 @@ crc32(const byte_t* buf, size_t len) {
     return crc ^ 0xFFFFFFFF;
 }
 
+/* Check if A20 is enabled */
+static bool
+_check_A20(void) {
+    bool ret;
+    const word_t test_offset = 0x7C00;
+    const word_t failure_offset = (((dword_t)0xFFFF << 4) + test_offset) & 0xFFFF;
+    /* Try to access byte at address FFFF:7C00
+     * Physical address of FFFF:7C00 is (0xFFFF << 4) + 0x7C00 = 0x107BF0
+     * If A20 is disabled 0x107BF0 becomes 0x7BF0
+     */
+    __asm__ volatile(
+      "cli\n"
+
+      "pushw %%es\n" /* Save ES and DS */
+      "pushw %%ds\n"
+
+      "xorw %%ax, %%ax\n"
+      "movw %%ax, %%es\n" /* ES = 0x0000 */
+
+      "notw %%ax\n"
+      "movw %%ax, %%ds\n" /* DS = 0xFFFF */
+
+      "movw %[test_offset], %%si\n"    /* SI = test_offset, test address = DS:SI */
+      "movw %[failure_offset], %%di\n" /* DI = failure_offset, failure address = ES:DI */
+
+      "movb %%ds:(%%si), %%al\n" /* Save byte at test address */
+      "pushw %%ax\n"
+
+      "movb %%es:(%%di), %%al\n" /* Save byte at failure address */
+      "pushw %%ax\n"
+
+      "movb $0x00, %%es:(%%di)\n" /* Place 0x00 at failure address */
+      "movb $0xFF, %%ds:(%%si)\n" /* Place 0xFF at test address */
+
+      "cmpb $0x00, %%es:(%%di)\n" /* Check if failure address is still 0x00 */
+
+      "popw %%ax\n" /* Restore value from failure address */
+      "movb %%al, %%es:(%%di)\n"
+
+      "popw %%ax\n" /* Restore value from test address */
+      "movb %%al, %%ds:(%%si)\n"
+
+      "popw %%ds\n" /* Restore ES and DS */
+      "popw %%es\n"
+
+      "sti"
+      : "=@ccz"(ret)
+      : [test_offset] "rm"(test_offset), [failure_offset] "rm"(failure_offset)
+      : "ax", "di", "si");
+    return ret;
+}
+
+static byte_t __inline__ _inb(word_t port) {
+    byte_t ret;
+    __asm__ volatile("inb %[port], %[ret]" : [ret] "=a"(ret) : [port] "Nd"(port));
+    return ret;
+}
+
+static void __inline__ _outb(word_t port, byte_t val) {
+    __asm__ volatile("outb %[val], %[port]" : : [val] "a"(val), [port] "Nd"(port));
+}
+
+bool
+enable_A20(void) {
+    bool CF;
+    byte_t kb_data;
+
+    /* Check if A20 is already enabled */
+    if (_check_A20()) {
+        return true;
+    }
+
+    /* Try BIOS method */
+    __asm__ volatile("int $0x15" : "=@ccc"(CF) : "a"((word_t)0x2401));
+    if (!CF && _check_A20()) {
+        return true;
+    }
+
+    /* Try keyboard controller method */
+    while (_inb(0x64) & 2)
+        continue;
+    _outb(0x64, 0xAD); /* Disable PS/2 port */
+
+    while (_inb(0x64) & 2)
+        continue;
+    _outb(0x64, 0xD0); /* Prepare to read data-output port */
+
+    while (!(_inb(0x64) & 1))
+        continue;
+    kb_data = _inb(0x60); /* Read data-output port */
+
+    while (_inb(0x64) & 2)
+        continue;
+    _outb(0x64, 0xD1); /* Prepare to write to data-output port */
+
+    while (_inb(0x64) & 2)
+        continue;
+    _outb(0x60, kb_data | 2); /* Set A20 gate bit */
+
+    while (_inb(0x64) & 2)
+        continue;
+    _outb(0x64, 0xAE); /* Enable PS/2 port */
+
+    while (_inb(0x64) & 2)
+        continue;
+
+    if (_check_A20()) {
+        return true;
+    }
+
+    /* Try Fast A20 method */
+    _outb(0x92, _inb(0x92) | 2);
+    if (_check_A20()) {
+        return true;
+    }
+
+    return false;
+}
+
 void
 set_GDT32_entry(GDT32_entry* entry,
                 dword_t base,

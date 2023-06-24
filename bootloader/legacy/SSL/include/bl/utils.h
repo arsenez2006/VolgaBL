@@ -28,6 +28,15 @@ uint32_t __check_ret
 crc32(const byte_t* buf, size_t len);
 
 /**
+ * @brief Enable A20 line
+ *
+ * @return true on success
+ * @return false on failure
+ */
+bool __check_ret
+enable_A20(void);
+
+/**
  * @brief Set the \ref GDT32_entry "GDT32 entry" object
  *
  * @param [out] entry Pointer to the \ref GDT32_entry "GDT32 entry" object to be filled

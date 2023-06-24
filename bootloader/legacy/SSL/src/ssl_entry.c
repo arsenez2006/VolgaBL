@@ -74,6 +74,12 @@ ssl_entry(void) {
     /* Initialize COM port */
     (void)bios_serial_init();
 
+    /* Enable A20 line */
+    if (!enable_A20()) {
+        print_error("Failed to enable A20");
+        goto halt;
+    }
+
     /* Null descriptor */
     set_GDT32_entry(&gdt_pm[0], 0, 0, 0, 0);
 

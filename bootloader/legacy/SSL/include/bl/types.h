@@ -369,6 +369,10 @@ typedef enum {
  *
  */
 typedef struct __packed GDT32_entry {
+    /**
+     * @warning Should be filled with \ref set_GDT32_entry
+     * 
+     */
     byte_t data[8];
 } GDT32_entry;
 
@@ -381,6 +385,10 @@ typedef struct __packed GDT32_entry {
  *
  */
 typedef struct __packed GDTR32 {
+    /**
+     * @warning Should be filled with \ref set_GDTR32
+     * 
+     */
     byte_t data[6];
 } GDTR32;
 

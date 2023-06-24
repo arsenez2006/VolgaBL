@@ -22,7 +22,8 @@ mem_init(void);
  * @brief Allocate memory
  *
  * @param [in] count Number of bytes to allocate
- * @return Pointer to allocated block
+ * @return  Pointer to allocated block\n
+ *          NULL on failure
  */
 void* __check_ret
 malloc(size_t count);
@@ -32,7 +33,8 @@ malloc(size_t count);
  *
  * @param [in] mem Pointer to block to reallocate
  * @param [in] new_size New size of the block
- * @return Pointer to the reallocated block
+ * @return  Pointer to the reallocated block
+ *          NULL on failure
  */
 void* __check_ret
 realloc(void* mem, size_t new_size);
@@ -46,9 +48,10 @@ void
 free(void* mem);
 
 /**
- * @brief Get the memory map
+ * @brief Get the \ref memory_map "memory map" object
  *
- * @return Pointer to the memory map
+ * @return  Pointer to the \ref memory_map "memory map" object
+ *          NULL on failure
  */
 memory_map*
 get_memory_map(void);

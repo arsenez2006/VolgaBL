@@ -1,24 +1,27 @@
+name: Security
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
 
-  name: Security
-  on: [ "push" ]
+jobs:
+  security_scan:
+      name: Codacy security scan
+      runs-on: ubuntu-latest
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v3
 
-  jobs:
-    security_scan:
-        name: Codacy security scan
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
-
-            - name: Run Codacy analyze
-              uses: codacy/codacy-analysis-cli-action@master
-              with:
-                output: results.sarif
-                format: sarif
-                gh-code-scanning-compat: true
-                max-allowed-issues: 2147483647
-            
-            - name: Upload scan results
-              uses: github/codeql-action/upload-sarif@main
-              with:
-                sarif_file: results.sarif
+          - name: Run Codacy analyze
+            uses: codacy/codacy-analysis-cli-action@master
+            with:
+              output: results.sarif
+              format: sarif
+              gh-code-scanning-compat: true
+              max-allowed-issues: 2147483647
+          
+          - name: Upload scan results
+            uses: github/codeql-action/upload-sarif@main
+            with:
+              sarif_file: results.sarif

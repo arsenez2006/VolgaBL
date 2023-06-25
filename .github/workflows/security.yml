@@ -4,6 +4,7 @@
 
   jobs:
     security_scan:
+        name: Codacy security scan
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -11,3 +12,13 @@
 
             - name: Run Codacy analyze
               uses: codacy/codacy-analysis-cli-action@master
+              with:
+                output: results.sarif
+                format: sarif
+                gh-code-scanning-compat: true
+                max-allowed-issues: 2147483647
+            
+            - name: Upload scan results
+              uses: github/codeql-action/upload-sarif@main
+              with:
+                sarif_file: results.sarif

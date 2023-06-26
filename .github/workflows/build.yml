@@ -23,4 +23,6 @@ jobs:
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
       - name: Build the project
-        run: make
+        run: |
+          cd build
+          make

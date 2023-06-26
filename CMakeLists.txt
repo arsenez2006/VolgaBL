@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 include(cmake/toolchain.cmake)
 include(cmake/flags.cmake)
+include(cmake/create_image.cmake)
 project(VolgaOS ASM)
 
 include(cmake/options.cmake)
@@ -8,37 +9,14 @@ include(cmake/dependencies.cmake)
 
 find_dependencies()
 
-# ISO variables
-set(OUT_ISO ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.iso)
-# set(OUT_ISO /dev/sdc)
-set(OUT_ISO_MBR_BS 1)
-set(OUT_ISO_MBR_OFF 0)
-set(OUT_ISO_MBR_COUNT 446)
-set(OUT_ISO_SSL_BS 512)
-set(OUT_ISO_SSL_OFF 2048)
-set(OUT_ISO_SSL_COUNT 128)
-set(OUT_ISO_TSL_BS 512)
-set(OUT_ISO_TSL_OFF 4096)
-set(OUT_ISO_TSL_COUNT 128)
+create_image()
 
-if(NOT EXISTS ${OUT_ISO})
-    exec_program(${DD}
-        ARGS if=/dev/zero of=${OUT_ISO} bs=$[1024 * 1024] count=$[8 * 1024]
-    )
-    exec_program(${SFDISK}
-        ARGS ${OUT_ISO} < ${PROJECT_SOURCE_DIR}/disk_layout.map
-    )
+# Compile bootloader
+if(VLGBL_LEGACY)
+    add_subdirectory(bootloader/legacy)
 endif()
-
-# Target for remapping ISO
-add_custom_target(remap 
-    COMMAND ${SFDISK} ${OUT_ISO} < ${PROJECT_SOURCE_DIR}/disk_layout.map
-)
 
 # Target for buiilding docs
 add_custom_target(docs
     COMMAND doxygen ${PROJECT_SOURCE_DIR}/Doxyfile
 )
-
-# Compile bootloader
-add_subdirectory(bootloader/legacy)

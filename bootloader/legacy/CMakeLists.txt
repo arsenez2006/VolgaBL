@@ -57,8 +57,8 @@ target_link_options(${TSL_TARGET} PRIVATE ${LINK_FLAGS_32})
 
 # Write bootloader to ISO
 add_custom_target(${PROJECT_NAME} ALL
-    COMMAND ${DD} if=$<TARGET_FILE:${MBR_TARGET}> of=${OUT_ISO} bs=${OUT_ISO_MBR_BS} count=${OUT_ISO_MBR_COUNT} seek=${OUT_ISO_MBR_OFF} conv=notrunc
-    COMMAND ${DD} if=$<TARGET_FILE:${SSL_TARGET}> of=${OUT_ISO} bs=${OUT_ISO_SSL_BS} count=${OUT_ISO_SSL_COUNT} seek=${OUT_ISO_SSL_OFF} conv=notrunc
-    COMMAND ${DD} if=$<TARGET_FILE:${TSL_TARGET}> of=${OUT_ISO} bs=${OUT_ISO_TSL_BS} count=${OUT_ISO_TSL_COUNT} seek=${OUT_ISO_TSL_OFF} conv=notrunc
+    COMMAND ${DD} if=$<TARGET_FILE:${MBR_TARGET}> of=${OUTPUT_IMAGE} bs=${OUTPUT_MBR_BS} count=${OUTPUT_MBR_SIZE} seek=${OUTPUT_MBR_OFFSET} conv=notrunc
+    COMMAND ${DD} if=$<TARGET_FILE:${SSL_TARGET}> of=${OUTPUT_IMAGE} bs=${OUTPUT_SSL_BS} count=${OUTPUT_SSL_SIZE} seek=${OUTPUT_SSL_OFFSET} conv=notrunc
+    COMMAND ${DD} if=$<TARGET_FILE:${TSL_TARGET}> of=${OUTPUT_IMAGE} bs=${OUTPUT_TSL_BS} count=${OUTPUT_TSL_SIZE} seek=${OUTPUT_TSL_OFFSET} conv=notrunc
     DEPENDS ${MBR_TARGET} ${SSL_TARGET} ${TSL_TARGET}
 )

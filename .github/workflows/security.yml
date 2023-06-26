@@ -14,7 +14,9 @@ on:
       - "**.h"
       - "**.cpp"
       - "**.hpp"
-
+permissions:
+  contents: read
+  security-events: write
 jobs:
   security_scan:
       name: Codacy security scan

@@ -23,8 +23,8 @@ function(create_image)
     # Create image
     if(NOT EXISTS ${OUTPUT_IMAGE})
         exec_program(${DD}
-            ARGS if=/dev/zero of=${OUTPUT_IMAGE} bs=$[1024 * 1024] count=$[128]
-            # OUTPUT_VARIABLE SILENT
+            ARGS if=/dev/zero of=${OUTPUT_IMAGE} bs=1048576 count=128
+            OUTPUT_VARIABLE SILENT
         )
     endif()
 

@@ -25,4 +25,4 @@ jobs:
       - name: Build the project
         run: |
           cd build
-          make
+          make VERBOSE=1

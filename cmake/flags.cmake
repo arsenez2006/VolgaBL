@@ -7,7 +7,7 @@ list(APPEND C_DIALECT
     "-ffreestanding" 
 )
 list(APPEND C_OPTIMIZATION 
-    "-Oz"
+    "-Os"
 )
 list(APPEND C_INSTRUMENTATION 
     "-fno-stack-protector"

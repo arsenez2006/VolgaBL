@@ -1,0 +1,23 @@
+name: Build
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build the project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+      - name: Build the project
+        run: make

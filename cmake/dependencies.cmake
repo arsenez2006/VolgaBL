@@ -1,4 +1,7 @@
 function(find_dependencies)
+
+    find_package(Doxygen)
+
     if(DD_PATH)
         set(DD ${DD_PATH} CACHE FILEPATH "Program path.")
     endif()

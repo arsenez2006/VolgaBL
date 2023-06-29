@@ -1,6 +1,6 @@
 # Executables
-option(DD_PATH "Full path to DD executable.")
-option(SFDISK_PATH "Full path to SFDISK executable")
+set(DD_PATH "" CACHE FILEPATH "Full path to DD executable")
+set(SFDISK_PATH "" CACHE FILEPATH "Full path to SFDISK executable")
 
 # Bootloader configuration
 option(VLGBL_LEGACY "Build legacy bootloader" ON)

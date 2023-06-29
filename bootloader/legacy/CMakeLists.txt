@@ -9,6 +9,9 @@ set(MBR_TARGET ${PROJECT_NAME}_mbr)
 set(SSL_TARGET ${PROJECT_NAME}_ssl)
 set(TSL_TARGET ${PROJECT_NAME}_tsl)
 
+# Docs targets
+set(SSL_DOCS ${SSL_TARGET}_docs)
+
 # Compile MBR
 add_subdirectory(MBR)
 
@@ -27,3 +30,4 @@ add_custom_target(${PROJECT_NAME}
 )
 
 set(BOOTLOADER_LEGACY_DEPENDENCY ${PROJECT_NAME} PARENT_SCOPE)
+set(BOOTLOADER_LEGACY_DOCS_DEPENDENCY ${SSL_DOCS} PARENT_SCOPE)

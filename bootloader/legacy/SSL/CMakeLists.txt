@@ -55,3 +55,16 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     LINK_DEPENDS ${LD_SCRIPT}
     LINK_FLAGS "-Xlinker --oformat=binary -Xlinker -Map=${SYM_MAP} -T ${LD_SCRIPT}"
 )
+
+# Generate docs
+set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/VLGBL/Legacy/SSL)
+set(DOXYGEN_PROJECT_NAME "SSL")
+set(DOXYGEN_PROJECT_BRIEF "Second Stage Loader")
+set(DOXYGEN_MACRO_EXPANSION YES)
+set(DOXYGEN_EXPAND_ONLY_PREDEF NO)
+list(APPEND DOXYGEN_PREDEFINED
+    "__attribute__(x)="
+    "__bool_true_false_are_defined"
+    "DOX_SKIP"
+)
+doxygen_add_docs(${SSL_DOCS})

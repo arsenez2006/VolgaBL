@@ -31,6 +31,7 @@ function(create_image)
     # Map image
     exec_program(${SFDISK}
         ARGS ${OUTPUT_IMAGE} < ${IMAGE_LAYOUT}
+        OUTPUT_VARIABLE SILENT
     )
 
     # Get the actual image map

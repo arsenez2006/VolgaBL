@@ -15,9 +15,11 @@ create_image()
 add_subdirectory(bootloader)
 
 # Target for buiilding docs
-add_custom_target(docs
-    DEPENDS VLGBL_docs
-)
+if(BUILD_DOCS)
+    add_custom_target(docs
+        DEPENDS VLGBL_docs
+    )
+endif(BUILD_DOCS)
 
 add_custom_target(${PROJECT_NAME} ALL
     DEPENDS VLGBL

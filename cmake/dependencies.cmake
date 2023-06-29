@@ -1,7 +1,9 @@
 function(find_dependencies)
 
-    find_package(Doxygen)
-
+    if(BUILD_DOCS)
+        find_package(Doxygen)
+    endif()
+    
     if(DD_PATH)
         set(DD ${DD_PATH} CACHE FILEPATH "Program path.")
     endif()

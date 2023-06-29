@@ -17,6 +17,7 @@ set(LD_SCRIPT "${PROJECT_SOURCE_DIR}/SSL.ld")
 set(SYM_MAP "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map")
 
 # Compile options
+set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG")
 list(APPEND C_OPTIONS
     ${C_DIALECT}
     ${C_OPTIMIZATION}
@@ -57,14 +58,16 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # Generate docs
-set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/VLGBL/Legacy/SSL)
-set(DOXYGEN_PROJECT_NAME "SSL")
-set(DOXYGEN_PROJECT_BRIEF "Second Stage Loader")
-set(DOXYGEN_MACRO_EXPANSION YES)
-set(DOXYGEN_EXPAND_ONLY_PREDEF NO)
-list(APPEND DOXYGEN_PREDEFINED
-    "__attribute__(x)="
-    "__bool_true_false_are_defined"
-    "DOX_SKIP"
-)
-doxygen_add_docs(${SSL_DOCS})
+if(BUILD_DOCS)
+    set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/VLGBL/Legacy/SSL)
+    set(DOXYGEN_PROJECT_NAME "SSL")
+    set(DOXYGEN_PROJECT_BRIEF "Second Stage Loader")
+    set(DOXYGEN_MACRO_EXPANSION YES)
+    set(DOXYGEN_EXPAND_ONLY_PREDEF NO)
+    list(APPEND DOXYGEN_PREDEFINED
+        "__attribute__(x)="
+        "__bool_true_false_are_defined"
+        "DOX_SKIP"
+    )
+    doxygen_add_docs(${SSL_DOCS})
+endif(BUILD_DOCS)

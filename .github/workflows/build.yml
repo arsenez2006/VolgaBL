@@ -11,18 +11,30 @@ jobs:
     name: Build the project
     runs-on: ubuntu-latest
     steps:
-      - name: Install dependencies
+      - name: Install NASM
         uses: ilammy/setup-nasm@v1
+      - name: Install Doxygen
+        uses: ssciwr/doxygen-install@v1.1.0
       
       - name: Checkout code
         uses: actions/checkout@v3
       
       - name: Configure CMake
         run: |
-          mkdir build
+          mkdir -p ${{ github.workspace }}/build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake ${{ github.workspace }} -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=Release -DBUILD_DOCS=ON -DOUTPUT_IMAGE=${{ github.workspace }}/VolgaOS.iso
       - name: Build the project
         run: |
-          cd build
+          cd ${{ github.workspace }}/build
           make
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: os-image
+          path: ${{ github.workspace }}/VolgaOS.iso
+      - uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: ${{ github.workspace }}/docs

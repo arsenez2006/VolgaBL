@@ -24,17 +24,25 @@ jobs:
           mkdir -p ${{ github.workspace }}/build
           cd build
           cmake ${{ github.workspace }} -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=Release -DBUILD_DOCS=ON -DOUTPUT_IMAGE=${{ github.workspace }}/VolgaOS.iso
+
       - name: Build the project
         run: |
           cd ${{ github.workspace }}/build
           make
+      
+      - name: Build docs
+        run: |
+          cd ${{ github.workspace }}/build
+          make docs
         
-      - name: Upload artifacts
+      - name: Upload OS image
         uses: actions/upload-artifact@v3
         with:
           name: os-image
           path: ${{ github.workspace }}/VolgaOS.iso
-      - uses: actions/upload-artifact@v3
+      
+      - name: Upload docs
+        uses: actions/upload-artifact@v3
         with:
           name: docs
           path: ${{ github.workspace }}/docs

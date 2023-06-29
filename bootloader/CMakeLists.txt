@@ -9,6 +9,8 @@ add_custom_target(${PROJECT_NAME}
     DEPENDS ${BOOTLOADER_LEGACY_DEPENDENCY}
 )
 
-add_custom_target(${PROJECT_NAME}_docs
-    DEPENDS ${BOOTLOADER_LEGACY_DOCS_DEPENDENCY}
-)
+if(BUILD_DOCS)
+    add_custom_target(${PROJECT_NAME}_docs
+        DEPENDS ${BOOTLOADER_LEGACY_DOCS_DEPENDENCY}
+    )
+endif()

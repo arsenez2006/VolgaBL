@@ -18,3 +18,5 @@ jobs:
         with:
           prefix: VLGBL-Legacy-
           log-paths: bootloader/legacy/
+      - name: test print
+        run: echo ${{ steps.version.outputs.version }}

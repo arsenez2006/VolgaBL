@@ -1,0 +1,20 @@
+name: Versioning test
+on:
+  pull_request:
+    paths:
+      - .github/workflows/test.yml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      
+      - name: Git Version
+        uses: codacy/git-version@2.4.0
+        with:
+          prefix: VLGBL-Legacy-
+          log-paths: bootloader/legacy/

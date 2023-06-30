@@ -14,6 +14,7 @@ jobs:
           fetch-depth: 0
       
       - name: Git Version
+        id: version
         uses: codacy/git-version@2.4.0
         with:
           prefix: VLGBL-Legacy-

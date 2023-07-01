@@ -32,3 +32,12 @@ jobs:
       
       - name: Upload tag
         run: git push origin ${{ steps.version.outputs.version }}
+
+      - name: Test github.event
+        run: echo ${{ toJson(github.event) }}
+
+      - name: Test github.event_name
+        run: echo ${{ toJson(github.event_name) }}
+      
+      - name: Test github.event_path
+        run: echo ${{ toJson(github.event_path) }}

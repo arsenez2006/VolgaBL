@@ -19,11 +19,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  security-events: write
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,6 +42,8 @@ jobs:
   security_scan:
     name: Code security scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     needs: lint
     steps:
       - name: Checkout code

@@ -47,7 +47,7 @@ print_error(const char* error_str) {
  *          - Get memory map
  *          - // TODO: Get video modes
  *          - // TODO: Enable graphics mode
- *          - // TODO: Enable A20
+ *          - Enable A20
  *          - Enable Protected Mode
  *          - Run `Third Stage Loader`
  */

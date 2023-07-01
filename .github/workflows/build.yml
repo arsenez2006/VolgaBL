@@ -1,9 +1,11 @@
-name: Build
+name: Build Check
 on:
   push:
-    branches: ["dev"]
+    branches:
+      - dev
   pull_request:
-    branches: ["dev"]
+    branches: 
+      - dev
 permissions:
   contents: read
 jobs:
@@ -29,20 +31,3 @@ jobs:
         run: |
           cd ${{ github.workspace }}/build
           make
-      
-      - name: Build docs
-        run: |
-          cd ${{ github.workspace }}/build
-          make docs
-        
-      - name: Upload OS image
-        uses: actions/upload-artifact@v3
-        with:
-          name: os-image
-          path: ${{ github.workspace }}/VolgaOS.iso
-      
-      - name: Upload docs
-        uses: actions/upload-artifact@v3
-        with:
-          name: docs
-          path: ${{ github.workspace }}/docs

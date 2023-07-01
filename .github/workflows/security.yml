@@ -1,14 +1,16 @@
-name: Security
+name: Security Check
 on:
   push:
-    branches: [ "dev" ]
+    branches: 
+      - dev
     paths:
       - "**.c"
       - "**.h"
       - "**.cpp"
       - "**.hpp"
   pull_request:
-    branches: [ "dev" ]
+    branches: 
+      - dev
     paths:
       - "**.c"
       - "**.h"

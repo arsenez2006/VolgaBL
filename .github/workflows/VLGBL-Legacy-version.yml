@@ -3,11 +3,11 @@ on:
   pull_request:
     paths:
       - .github/workflows/VLGBL-Legacy-version.yml
-      - bootloader/legacy
+      - bootloader/legacy/**
   push:
     paths:
       - .github/workflows/VLGBL-Legacy-version.yml
-      - bootloader/legacy
+      - bootloader/legacy/**
     branches:
       - dev
 permissions:

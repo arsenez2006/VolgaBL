@@ -1,0 +1,33 @@
+name: Build Check
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches: 
+      - dev
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install NASM
+        uses: ilammy/setup-nasm@v1
+      - name: Install Doxygen
+        uses: ssciwr/doxygen-install@v1.1.0
+      
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Configure CMake
+        run: |
+          mkdir -p ${{ github.workspace }}/build
+          cd build
+          cmake ${{ github.workspace }} -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=Release -DBUILD_DOCS=ON -DOUTPUT_IMAGE=${{ github.workspace }}/VolgaOS.iso
+
+      - name: Build the project
+        run: |
+          cd ${{ github.workspace }}/build
+          make

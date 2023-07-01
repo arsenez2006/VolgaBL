@@ -1,0 +1,38 @@
+name: VLGBL Legacy Version
+on:
+  pull_request:
+    paths:
+      - .github/workflows/VLGBL-Legacy-version.yml
+      - bootloader/legacy
+  push:
+    paths:
+      - .github/workflows/VLGBL-Legacy-version.yml
+      - bootloader/legacy
+    branches:
+      - dev
+permissions:
+  contents: write
+jobs:
+  create_version:
+    name: Create VLGBL Legacy Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      
+      - name: Run Git Version
+        id: version
+        uses: codacy/git-version@2.8.0
+        with:
+          prefix: VLGBL-Legacy-
+          log-paths: bootloader/legacy/
+
+      - name: Create tag
+        run: git tag ${{ steps.version.outputs.version }}
+      
+      - name: Upload tag
+        run: git push origin ${{ steps.version.outputs.version }}
+

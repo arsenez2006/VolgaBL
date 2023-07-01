@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 include(cmake/flags.cmake)
+# Get Version
+exec_program(git
+    ARGS describe --tags --abbrev=0 --match "VLGBL-Legacy*"
+    OUTPUT_VARIABLE VLGBL_VERSION
+)
 project(VLGBL_legacy
     DESCRIPTION "VLGBL Legacy bootloader"
 )

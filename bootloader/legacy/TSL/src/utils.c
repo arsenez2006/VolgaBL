@@ -14,8 +14,7 @@ inw(word_t port) {
     return ret;
 }
 
-dword_t
-inl(word_t port) {
+dword_t inl(word_t port) {
     dword_t ret;
     __asm__ volatile("inl %[port], %[ret]" : [ret] "=a"(ret) : [port] "Nd"(port));
     return ret;

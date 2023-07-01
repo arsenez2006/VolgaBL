@@ -32,6 +32,12 @@ jobs:
         uses: DoozyX/clang-format-lint-action@v0.16.2
         with:
           clangFormatVersion: 15
+          inplace: true
+      
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: Committing clang-format changes 
   security_scan:
     name: Code security scan
     runs-on: ubuntu-latest

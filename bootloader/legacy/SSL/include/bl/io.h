@@ -2,7 +2,7 @@
  * @file io.h
  * @author Arseny Lashkevich (arsenez@cybercommunity.space)
  * @brief Implements printf
- * 
+ *
  */
 #ifndef BL_IO_H
 #define BL_IO_H
@@ -16,9 +16,10 @@
  * @param [out] s Pointer to a buffer where the resulting C-string is stored
  * @param [in] n Maximum number of bytes to be used in the buffer
  * @param [in] format C-string that contains a format string
- * @param [in] arg A value identifying a variable arguments list initialized with va_start
- * @return The number of characters that would have been written if n had been sufficiently large,
- * not counting the terminating null character
+ * @param [in] arg A value identifying a variable arguments list initialized
+ * with va_start
+ * @return The number of characters that would have been written if n had been
+ * sufficiently large, not counting the terminating null character
  */
 int
 vsnprintf(char* s, size_t n, const char* format, va_list arg);
@@ -30,8 +31,8 @@ vsnprintf(char* s, size_t n, const char* format, va_list arg);
  * @param [in] n Maximum number of bytes to be used in the buffer
  * @param [in] format C-string that contains a format string
  * @param [in out] ... Additional args
- * @return The number of characters that would have been written if n had been sufficiently large,
- * not counting the terminating null character
+ * @return The number of characters that would have been written if n had been
+ * sufficiently large, not counting the terminating null character
  */
 int __print_fmt(3, 4) snprintf(char* s, size_t n, const char* format, ...);
 
@@ -41,8 +42,8 @@ int __print_fmt(3, 4) snprintf(char* s, size_t n, const char* format, ...);
  * @param [out] s Pointer to a buffer where the resulting C-string is stored
  * @param [in] format C-string that contains a format string
  * @param [in] ... Additional args
- * @return The number of characters that would have been written if n had been sufficiently large,
- * not counting the terminating null character
+ * @return The number of characters that would have been written if n had been
+ * sufficiently large, not counting the terminating null character
  */
 int __print_fmt(2, 3) sprintf(char* s, const char* format, ...);
 
@@ -51,8 +52,8 @@ int __print_fmt(2, 3) sprintf(char* s, const char* format, ...);
  *
  * @param [in] format C-string that contains a format string
  * @param [in] ... Additional args
- * @return The number of characters that would have been written if n had been sufficiently large,
- * not counting the terminating null character
+ * @return The number of characters that would have been written if n had been
+ * sufficiently large, not counting the terminating null character
  */
 int __print_fmt(1, 2) printf(const char* format, ...);
 
@@ -61,8 +62,8 @@ int __print_fmt(1, 2) printf(const char* format, ...);
  *
  * @param [in] format C-string that contains a format string
  * @param [in] ... Additional args
- * @return The number of characters that would have been written if n had been sufficiently large,
- * not counting the terminating null character
+ * @return The number of characters that would have been written if n had been
+ * sufficiently large, not counting the terminating null character
  */
 int __print_fmt(1, 2) serial_printf(const char* format, ...);
 

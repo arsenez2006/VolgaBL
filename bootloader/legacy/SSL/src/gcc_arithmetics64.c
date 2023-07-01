@@ -52,7 +52,10 @@ typedef union gcc64 {
  * @param [out] remainder Pointer to the output remainder or NULL
  */
 void
-unsigned_division64(qword_t dividend, qword_t divisor, qword_t* quotient, qword_t* remainder) {
+unsigned_division64(qword_t dividend,
+                    qword_t divisor,
+                    qword_t* quotient,
+                    qword_t* remainder) {
     /* Based on "Long division" algorithm
      * https://en.wikipedia.org/wiki/Division_algorithm#Integer_division_(unsigned)_with_remainder
      */

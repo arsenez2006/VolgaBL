@@ -39,7 +39,8 @@ static size_t __inline__ _align16(size_t val) {
 static void
 _allocate_block(_block_hdr* after, size_t size) {
 
-    _block_hdr* new_block = (_block_hdr*)((byte_t*)after + after->size + sizeof(_block_hdr));
+    _block_hdr* new_block =
+      (_block_hdr*)((byte_t*)after + after->size + sizeof(_block_hdr));
     new_block->free = true;
     new_block->size = size;
 
@@ -57,7 +58,8 @@ _find_max_block(void) {
     _block_hdr* block;
 
     _mem_ctx.max_alloc = 0;
-    for (block = (_block_hdr*)_mem_ctx.start; block != NULL; block = block->next) {
+    for (block = (_block_hdr*)_mem_ctx.start; block != NULL;
+         block = block->next) {
         if (block->size > _mem_ctx.max_alloc) {
             _mem_ctx.max_alloc = block->size;
         }
@@ -88,8 +90,9 @@ mem_init(void) {
 
     initial_block = (_block_hdr*)_mem_ctx.start;
     initial_block->free = true;
-    initial_block->size =
-      _heap_size - ((ptrdiff_t)_mem_ctx.start - (ptrdiff_t)&_heap) - sizeof(_block_hdr);
+    initial_block->size = _heap_size -
+                          ((ptrdiff_t)_mem_ctx.start - (ptrdiff_t)&_heap) -
+                          sizeof(_block_hdr);
     initial_block->next = NULL;
     initial_block->prev = NULL;
 
@@ -276,7 +279,8 @@ _dump_heap(void) {
                   _mem_ctx.max_alloc,
                   sizeof(_block_hdr));
 
-    for (block = (_block_hdr*)_mem_ctx.start; block != NULL; block = block->next) {
+    for (block = (_block_hdr*)_mem_ctx.start; block != NULL;
+         block = block->next) {
         serial_printf("Block %zu:\n"
                       "    Free = %d\n"
                       "    Block address = %p\n"
@@ -298,11 +302,12 @@ void
 _dump_memory_map(memory_map* mem_map) {
     memory_map_node* node = mem_map->list;
     while (node) {
-        serial_printf("Base address = %#.16llx, Limit = %#.16llx, Type = %d, ACPI = %d\n",
-                      node->entry.base,
-                      node->entry.limit,
-                      node->entry.type,
-                      node->entry.ACPI);
+        serial_printf(
+          "Base address = %#.16llx, Limit = %#.16llx, Type = %d, ACPI = %d\n",
+          node->entry.base,
+          node->entry.limit,
+          node->entry.type,
+          node->entry.ACPI);
         node = node->next;
     }
 }

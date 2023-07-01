@@ -2,7 +2,7 @@
  * @file mem.h
  * @author Arseny Lashkevich (arsenez@cybercommunity.space)
  * @brief Memory allocator
- * 
+ *
  */
 #ifndef BL_MEM_H
 #define BL_MEM_H

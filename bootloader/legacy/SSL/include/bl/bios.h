@@ -2,7 +2,7 @@
  * @file bios.h
  * @author Arseny Lashkevich (arsenez@cybercommunity.space)
  * @brief Useful BIOS call wrappers for C
- * 
+ *
  */
 #ifndef BL_BIOS_H
 #define BL_BIOS_H
@@ -58,7 +58,7 @@ typedef struct __packed DAP {
  *
  * @typedef drive_parameteres
  * @brief drive_parameteres type
- * 
+ *
  */
 typedef struct __packed drive_parameteres {
     /**
@@ -131,9 +131,9 @@ bios_get_drive_parameteres(drive_parameteres* buffer);
  * @brief Get E820 memory map entry, using BIOS int 15h
  *
  * @param [in out]  offset
- *                  On call: offset from the beggining of the memory card (0 - start over)\n
- *                  On return: Next offset from the beggining of the memory card (0 - the whole map
- * has been transferred)
+ *                  On call: offset from the beggining of the memory card (0 -
+ * start over)\n On return: Next offset from the beggining of the memory card (0
+ * - the whole map has been transferred)
  * @param [in] buf_size Buffer size. Should be sizeof(memory_map_entry)
  * @param [in] buffer Pointer to buffer
  * @return true on success

@@ -2,7 +2,7 @@
  * @file string.h
  * @author Arseny Lashkevich (arsenez@cybercommunity.space)
  * @brief Functions for manipulating c-strings and buffers
- * 
+ *
  */
 #ifndef BL_STRING_H
 #define BL_STRING_H

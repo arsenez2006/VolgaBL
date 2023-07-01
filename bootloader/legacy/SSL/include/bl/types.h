@@ -211,8 +211,9 @@ typedef struct __packed GPT_header {
 /**
  * @struct GPT_partition_entry
  * @brief GPT partiion entry
- * @warning sizeof(\ref GPT_partition_entry) is not an actual size of entry. Refer \ref
- * GPT_header::entry_size "GPT Header" or \ref GPT_partition_array::entry_size "GPT Partition array"
+ * @warning sizeof(\ref GPT_partition_entry) is not an actual size of entry.
+ * Refer \ref GPT_header::entry_size "GPT Header" or \ref
+ * GPT_partition_array::entry_size "GPT Partition array"
  *
  * @typedef GPT_partition_entry
  * @brief GPT_partition_entry type
@@ -320,7 +321,8 @@ typedef enum {
      */
     GDT_ACCESS_DIRECTION = (1 << 2),
     /**
-     * @brief Defines a code segment, which can be executed from an equal or lower privilege level
+     * @brief Defines a code segment, which can be executed from an equal or
+     * lower privilege level
      *
      */
     GDT_ACCESS_CONFORMING = (1 << 2),
@@ -371,7 +373,7 @@ typedef enum {
 typedef struct __packed GDT32_entry {
     /**
      * @warning Should be filled with \ref set_GDT32_entry
-     * 
+     *
      */
     byte_t data[8];
 } GDT32_entry;
@@ -387,7 +389,7 @@ typedef struct __packed GDT32_entry {
 typedef struct __packed GDTR32 {
     /**
      * @warning Should be filled with \ref set_GDTR32
-     * 
+     *
      */
     byte_t data[6];
 } GDTR32;

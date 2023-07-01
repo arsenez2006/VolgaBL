@@ -21,10 +21,12 @@ static byte_t drive_GUID[16];
 
 /* VolgaOS partition types */
 static const byte_t kernel_partition_type[] = {
-    0x98, 0xE5, 0xA9, 0x78, 0x38, 0x36, 0x67, 0x4D, 0xB2, 0xEB, 0x01, 0x23, 0xD0, 0xAF, 0xBD, 0xBD
+    0x98, 0xE5, 0xA9, 0x78, 0x38, 0x36, 0x67, 0x4D,
+    0xB2, 0xEB, 0x01, 0x23, 0xD0, 0xAF, 0xBD, 0xBD
 }; /* 78A9E598-3638-4D67-B2EB-0123D0AFBDBD */
 static const byte_t tsl_partition_type[] = {
-    0xC7, 0x0D, 0x6D, 0x87, 0x66, 0xCF, 0x63, 0x4C, 0xBC, 0xEE, 0xBD, 0x79, 0xEE, 0x10, 0xF5, 0x93
+    0xC7, 0x0D, 0x6D, 0x87, 0x66, 0xCF, 0x63, 0x4C,
+    0xBC, 0xEE, 0xBD, 0x79, 0xEE, 0x10, 0xF5, 0x93
 }; /* 876D0DC7-CF66-4C63-BCEE-BD79EE10F593 */
 
 /**
@@ -40,8 +42,8 @@ print_error(const char* error_str) {
 /**
  * @brief Second Stage Loader entry
  *
- * @details `Second Stage Loader` (SSL) works in Real Mode, so it can use BIOS interface.\n
- *          SSL goals are:\n
+ * @details `Second Stage Loader` (SSL) works in Real Mode, so it can use BIOS
+ * interface.\n SSL goals are:\n
  *          - Load `Third Stage Loader` and kernel partitions to memory
  *          - Get GUID of the booted drive
  *          - Get memory map
@@ -132,7 +134,8 @@ ssl_entry(void) {
     }
 
     /* Read GPT header */
-    if ((gpt_hdr = malloc(SECTOR_SIZE)) == NULL) { /* Allocate enough space for reading a sector */
+    if ((gpt_hdr = malloc(SECTOR_SIZE)) ==
+        NULL) { /* Allocate enough space for reading a sector */
         print_error("Failed to read GPT header.");
         goto halt;
     }
@@ -147,8 +150,8 @@ ssl_entry(void) {
         goto halt;
     }
     if ((gpt_hdr = realloc(gpt_hdr, sizeof(GPT_header))) ==
-        NULL) { /* GPT header size is less than sector size, so we should reallocate it to reduce
-                   use of memory */
+        NULL) { /* GPT header size is less than sector size, so we should
+                   reallocate it to reduce use of memory */
         print_error("Failed to read GPT header.");
         goto halt;
     }
@@ -161,7 +164,8 @@ ssl_entry(void) {
 
     /* Compare GPT checksum */
     gpt_crc32_copy = gpt_hdr->crc32;
-    gpt_hdr->crc32 = 0; /* GPT CRC32 checksum must be counted with CRC32 field being zero */
+    gpt_hdr->crc32 =
+      0; /* GPT CRC32 checksum must be counted with CRC32 field being zero */
     gpt_crc32 = crc32((byte_t*)gpt_hdr, sizeof(GPT_header));
     if (gpt_crc32 != gpt_crc32_copy) {
         print_error("GPT header is corrupted. CRC32 mismatch");
@@ -178,13 +182,15 @@ ssl_entry(void) {
     }
 
     /* Find Third Stage Loader partition */
-    if ((tsl_partition = find_partition(partition_array, tsl_partition_type)) == NULL) {
+    if ((tsl_partition = find_partition(partition_array, tsl_partition_type)) ==
+        NULL) {
         print_error("Failed to find Third Stage Loader partition");
         goto halt;
     }
 
     /* Find kernel partition */
-    if ((kernel_partition = find_partition(partition_array, kernel_partition_type)) == NULL) {
+    if ((kernel_partition =
+           find_partition(partition_array, kernel_partition_type)) == NULL) {
         print_error("Failed to find kernel partition");
         goto halt;
     }
@@ -192,7 +198,8 @@ ssl_entry(void) {
     /* Load Third Stage Loader */
     read_context.segment = TSL_SEG;
     read_context.offset = 0x0000;
-    read_context.sectors = tsl_partition->end_lba - tsl_partition->start_lba + 1;
+    read_context.sectors =
+      tsl_partition->end_lba - tsl_partition->start_lba + 1;
     read_context.lba = tsl_partition->start_lba;
     if (!bios_read_drive(&read_context)) {
         print_error("Failed to load Third Stage Loader");

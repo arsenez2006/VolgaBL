@@ -12,7 +12,10 @@
 #ifndef DOX_SKIP
 
 /* Write function prototype */
-typedef void (*buffer_fcn)(void* buffer, size_t max_size, size_t index, char ch);
+typedef void (*buffer_fcn)(void* buffer,
+                           size_t max_size,
+                           size_t index,
+                           char ch);
 
 /* Write to memory buffer */
 static void
@@ -105,7 +108,8 @@ _format_output(buffer_fcn write,
     } else {
         /* Right-Justification */
 
-        /* Calculate fill size, assuming width is unsigned (if output_size > width then output_size
+        /* Calculate fill size, assuming width is unsigned (if output_size >
+         * width then output_size
          * - width will be incorrect) */
         width = width < output_size ? 0 : width - output_size;
 
@@ -151,7 +155,8 @@ _ntoa(uintmax_t num,
 
     /* Write digits in reverse sequence */
     do {
-        num_buffer[index++] = (hcase ? hcase_alphabet : lcase_alphabet)[num % radix];
+        num_buffer[index++] =
+          (hcase ? hcase_alphabet : lcase_alphabet)[num % radix];
     } while ((num /= radix) > 0);
 
     /* Pad number if precision > index */
@@ -184,7 +189,11 @@ _ntoa(uintmax_t num,
 
 /* Internal vsnprintf */
 static int
-_vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer_fcn write) {
+_vsnprintf(void* buffer,
+           size_t max_size,
+           const char* format,
+           va_list va,
+           buffer_fcn write) {
     size_t index = 0U, num_size;
     uint16_t flags, width, precision;
     bool flags_loop;
@@ -332,15 +341,22 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                     else
                         arg.int_type = va_arg(va, int);
 
-                    num_size = _ntoa(arg.intmax_type < 0 ? -arg.intmax_type : arg.intmax_type,
+                    num_size = _ntoa(arg.intmax_type < 0 ? -arg.intmax_type
+                                                         : arg.intmax_type,
                                      arg.intmax_type < 0,
                                      10,
                                      num_buffer,
                                      flags,
                                      precision,
                                      false);
-                    index = _format_output(
-                      write, num_buffer, max_size, index, num_buffer, num_size, flags, width);
+                    index = _format_output(write,
+                                           num_buffer,
+                                           max_size,
+                                           index,
+                                           num_buffer,
+                                           num_size,
+                                           flags,
+                                           width);
 
                     format++;
                 } break;
@@ -350,9 +366,11 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                 case 'X': {
                     arg.uintmax_type = 0U;
                     if (flags & FLAG_CHAR)
-                        arg.uchar_type = (unsigned char)va_arg(va, unsigned int);
+                        arg.uchar_type =
+                          (unsigned char)va_arg(va, unsigned int);
                     else if (flags & FLAG_SHORT)
-                        arg.ushort_type = (unsigned short)va_arg(va, unsigned int);
+                        arg.ushort_type =
+                          (unsigned short)va_arg(va, unsigned int);
                     else if (flags & FLAG_LONG_LONG)
                         arg.ulong_long_type = va_arg(va, unsigned long long);
                     else if (flags & FLAG_LONG)
@@ -386,8 +404,14 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                                      flags,
                                      precision,
                                      *format == 'X' ? true : false);
-                    index = _format_output(
-                      write, buffer, max_size, index, num_buffer, num_size, flags, width);
+                    index = _format_output(write,
+                                           buffer,
+                                           max_size,
+                                           index,
+                                           num_buffer,
+                                           num_size,
+                                           flags,
+                                           width);
 
                     format++;
                 } break;
@@ -398,8 +422,14 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                     else
                         arg.int_type = va_arg(va, int);
 
-                    index = _format_output(
-                      write, buffer, max_size, index, (const char*)&arg.int_type, 1, flags, width);
+                    index = _format_output(write,
+                                           buffer,
+                                           max_size,
+                                           index,
+                                           (const char*)&arg.int_type,
+                                           1,
+                                           flags,
+                                           width);
 
                     format++;
                 } break;
@@ -408,14 +438,15 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                     if (flags & FLAG_LONG)
                         /* WCHAR_T won't be implemented */;
                     else
-                        index = _format_output(write,
-                                               buffer,
-                                               max_size,
-                                               index,
-                                               (const char*)arg.ptr_type,
-                                               strlen((const char*)arg.ptr_type),
-                                               flags,
-                                               width);
+                        index =
+                          _format_output(write,
+                                         buffer,
+                                         max_size,
+                                         index,
+                                         (const char*)arg.ptr_type,
+                                         strlen((const char*)arg.ptr_type),
+                                         flags,
+                                         width);
 
                     format++;
                 } break;
@@ -424,10 +455,21 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                     arg.ptr_type = (uintptr_t)va_arg(va, void*);
 
                     flags |= FLAG_HASH;
-                    num_size =
-                      _ntoa(arg.uintmax_type, false, 16, num_buffer, flags, precision, false);
-                    index = _format_output(
-                      write, buffer, max_size, index, num_buffer, num_size, flags, width);
+                    num_size = _ntoa(arg.uintmax_type,
+                                     false,
+                                     16,
+                                     num_buffer,
+                                     flags,
+                                     precision,
+                                     false);
+                    index = _format_output(write,
+                                           buffer,
+                                           max_size,
+                                           index,
+                                           num_buffer,
+                                           num_size,
+                                           flags,
+                                           width);
 
                     format++;
                 } break;
@@ -453,8 +495,14 @@ _vsnprintf(void* buffer, size_t max_size, const char* format, va_list va, buffer
                     format++;
                 } break;
                 case '%': {
-                    index =
-                      _format_output(write, buffer, max_size, index, format++, 1, flags, width);
+                    index = _format_output(write,
+                                           buffer,
+                                           max_size,
+                                           index,
+                                           format++,
+                                           1,
+                                           flags,
+                                           width);
                 } break;
                 default:
                     format++;

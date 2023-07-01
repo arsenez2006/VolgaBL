@@ -39,7 +39,8 @@ enable_A20(void);
 /**
  * @brief Set the \ref GDT32_entry "GDT32 entry" object
  *
- * @param [out] entry Pointer to the \ref GDT32_entry "GDT32 entry" object to be filled
+ * @param [out] entry Pointer to the \ref GDT32_entry "GDT32 entry" object to be
+ * filled
  * @param [in] base Base address of the descriptor's segment
  * @param [in] limit Size of the descriptor's segment
  * @param [in] flags Flags of the descriptor
@@ -82,8 +83,8 @@ enter_unreal(word_t data_segment_offset);
  * @brief Get the partition array object
  *
  * @param [in] gpt_hdr Pointer to the \ref GPT_header "GPT header" object
- * @return  Pointer to the \ref GPT_partition_array "GPT Partition array" object\n
- *          NULL on failure
+ * @return  Pointer to the \ref GPT_partition_array "GPT Partition array"
+ * object\n NULL on failure
  */
 GPT_partition_array* __check_ret
 get_partition_array(const GPT_header* gpt_hdr);
@@ -91,7 +92,8 @@ get_partition_array(const GPT_header* gpt_hdr);
 /**
  * @brief Find partition by GUID
  *
- * @param [in] partition_array Pointer to the \ref GPT_partition_array "GPT Partition array" object
+ * @param [in] partition_array Pointer to the \ref GPT_partition_array "GPT
+ * Partition array" object
  * @param [in] GUID GUID of needed partition
  * @return  \ref GPT_partition_entry "GPT Partition entry" object\n
  *          NULL on failure
@@ -109,13 +111,13 @@ _dump_memory_map(memory_map* mem_map);
 #define dump_heap() _dump_heap()
 #define dump_memory_map(mem_map) _dump_memory_map(mem_map)
 #else
-#define dump_heap()                                                                                \
-    do {                                                                                           \
-        continue;                                                                                  \
+#define dump_heap()                                                            \
+    do {                                                                       \
+        continue;                                                              \
     } while (0)
-#define dump_memory_map(mem_map)                                                                   \
-    do {                                                                                           \
-        continue;                                                                                  \
+#define dump_memory_map(mem_map)                                               \
+    do {                                                                       \
+        continue;                                                              \
     } while (0)
 #endif /* NDEBUG */
 #endif /* DOX_SKIP */

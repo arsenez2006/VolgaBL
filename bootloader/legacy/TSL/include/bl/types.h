@@ -2,7 +2,7 @@
  * @file types.h
  * @author Arseny Lashkevich (arsenez@cybercommunity.space)
  * @brief Typedefs, data structers and enums used in Third Stage Loader
- * 
+ *
  */
 #ifndef BL_TYPES_H
 #define BL_TYPES_H

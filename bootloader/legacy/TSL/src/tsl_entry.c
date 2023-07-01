@@ -11,8 +11,8 @@
 /**
  * @brief Third Stage Loader entry
  *
- * @details `Third Stage Loader` works in Protected Mode. It's purpose is getting system ready for
- *          loading kernel\n
+ * @details `Third Stage Loader` works in Protected Mode. It's purpose is
+ * getting system ready for loading kernel\n
  *
  */
 void __noreturn

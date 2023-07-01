@@ -41,3 +41,6 @@ jobs:
       
       - name: Test github.event_path
         run: echo "${{ toJson(github.event_path) }}"
+
+      - name: Test github.event_path
+        run: cat "${{ github.event_path }}"

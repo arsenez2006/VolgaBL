@@ -9,7 +9,7 @@ SECTIONS
     .text :
     {
         BYTE(0xE9);
-        LONG(__bootstrap - 5);
+        LONG(__bootstrap - 5 - 0x20000);
         *(.text)
     } > TSL_segment
     .rodata :

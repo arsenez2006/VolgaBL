@@ -242,7 +242,7 @@ ssl_entry(void) {
                      "ljmp %[code_seg],$0x0000" /* Jump to Third Stage Loader */
                      :
                      : [data_seg] "rmN"((word_t)2 * sizeof(GDT32_entry)),
-                       [jmp_addr] "rmN"((dword_t)TSL_ADDR),
+                       [jmp_addr] "rmN"((dword_t)TSL_ADDR - 5),
                        [code_seg] "N"((word_t)1 * sizeof(GDT32_entry))
                      : "eax");
 

@@ -5,6 +5,7 @@
  *
  */
 #include <bl/defines.h>
+#include <bl/io.h>
 #include <bl/types.h>
 #include <bl/utils.h>
 
@@ -18,7 +19,7 @@
 void __noreturn
 tsl_entry(void) {
 
-    serial_putch('A');
+    serial_printf("tsl_entry = %p", (void*)tsl_entry);
 
     while (1) {
         __asm__ volatile("hlt");

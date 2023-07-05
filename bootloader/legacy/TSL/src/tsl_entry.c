@@ -18,7 +18,7 @@
 void __noreturn
 tsl_entry(void) {
 
-    outb(0x3F8, 'A');
+    serial_putch('A');
 
     while (1) {
         __asm__ volatile("hlt");

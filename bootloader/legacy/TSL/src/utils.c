@@ -47,3 +47,10 @@ outl(word_t port, dword_t val) {
                      :
                      : [val] "a"(val), [port] "Nd"(port));
 }
+
+void
+serial_putch(byte_t ch) {
+    while ((inb(0x3F8 + 5) & 0x20) == 0)
+        continue;
+    outb(0x3F8, ch);
+}

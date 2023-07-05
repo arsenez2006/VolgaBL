@@ -536,7 +536,7 @@ serial_printf(const char* format, ...) {
     va_list va;
     char buffer[1];
     int ret;
-    
+
     va_start(va, format);
     ret = _vsnprintf(buffer, SIZE_MAX, format, va, _buffer_serial);
     va_end(va);

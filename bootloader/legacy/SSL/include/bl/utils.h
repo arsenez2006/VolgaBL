@@ -92,8 +92,8 @@ get_partition_array(const GPT_header* gpt_hdr);
 /**
  * @brief Find partition by GUID
  *
- * @param [in] partition_array Pointer to the \ref GPT_partition_array "GPT
- * Partition array" object
+ * @param [in] partition_array
+ * Pointer to the \ref GPT_partition_array "GPT Partition array" object
  * @param [in] GUID GUID of needed partition
  * @return  \ref GPT_partition_entry "GPT Partition entry" object\n
  *          NULL on failure

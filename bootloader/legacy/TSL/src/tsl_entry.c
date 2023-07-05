@@ -17,7 +17,8 @@
  *
  */
 
-static void print_error(const char* error_str) {
+static void
+print_error(const char* error_str) {
     /* TODO: Implement graphics printf */
     serial_printf("VLGBL Error: %s.\n", error_str);
 }

@@ -54,3 +54,27 @@ serial_putch(byte_t ch) {
         continue;
     outb(0x3F8, ch);
 }
+
+bool check_cpuid(void) {
+    bool ret;
+    __asm__ volatile(
+        "pushfl\n"
+        "popl %%eax\n" /* Move EFLAGS to EAX */
+
+        "movl %%eax, %%ebx\n" /* Save original EFLAGS to EBX*/
+
+        "xorl $0x200000, %%eax\n" /* Change ID bit */
+
+        "pushl %%eax\n"
+        "popfl\n" /* Load Updated EFLAGS */
+
+        "pushfl\n"
+        "popl %%eax\n" /* Move Updated EFLAGS to EAX */
+
+        "xorl %%eax, %%ebx" /* Check ID bit */
+        : "=@ccz"(ret)
+        :
+        : "eax", "ebx"
+    );
+    return !ret;
+}

@@ -66,4 +66,13 @@ outl(word_t port, dword_t val);
 void
 serial_putch(byte_t ch);
 
+/**
+ * @brief Checks if CPUID available
+ *
+ * @return true - CPUID is available
+ * @return false - CPUID is not available
+ */
+bool
+check_cpuid(void);
+
 #endif /* BL_UTILS_H */

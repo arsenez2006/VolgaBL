@@ -21,9 +21,12 @@ align 16
 ; -------------------------------------------------------------------------------------------------
 section .text
 __bootstrap:
+    ; Get boot info
+    pop dword eax
     ; Setup stack
     cld
     mov esp, stack.top
 
     ; Call C code
+    push dword eax
     call _tsl_entry

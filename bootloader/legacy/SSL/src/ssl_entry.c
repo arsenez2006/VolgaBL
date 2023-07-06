@@ -55,6 +55,8 @@ print_error(const char* error_str) {
  */
 void __noreturn
 ssl_entry(void) {
+    boot_info_t* boot_info;
+
     memory_map* mem_map;
 
     GPT_header* gpt_hdr;
@@ -206,6 +208,12 @@ ssl_entry(void) {
         goto halt;
     }
 
+    /* Create boot info */
+    if ((boot_info = create_boot_info(drive_GUID, mem_map)) == NULL) {
+        print_error("Failed to create boot info");
+        goto halt;
+    }
+
     /* Used for debug */
     dump_heap();
     dump_memory_map(mem_map);
@@ -239,11 +247,13 @@ ssl_entry(void) {
                      "movb $0xE9, (0x0000)\n" /* Make jump stub */
                      "movl %[jmp_addr], (0x0001)\n"
 
+                     "pushl %[boot_info]\n"
                      "ljmp %[code_seg],$0x0000" /* Jump to Third Stage Loader */
                      :
                      : [data_seg] "rmN"((word_t)2 * sizeof(GDT32_entry)),
                        [jmp_addr] "rmN"((dword_t)TSL_ADDR - 5),
-                       [code_seg] "N"((word_t)1 * sizeof(GDT32_entry))
+                       [code_seg] "N"((word_t)1 * sizeof(GDT32_entry)),
+                       [boot_info] "rmN"((dword_t)boot_info + (get_ds() << 4))
                      : "eax");
 
 halt:

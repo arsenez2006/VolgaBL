@@ -359,3 +359,38 @@ find_partition(const GPT_partition_array* partition_array, const byte_t* GUID) {
     }
     return NULL;
 }
+
+boot_info_t*
+create_boot_info(const byte_t* drive_GUID, memory_map* mem_map) {
+    boot_info_t* boot_info;
+    memory_map_entry* mem_map_array;
+    memory_map_node* mem_map_node;
+    size_t i;
+
+    if ((boot_info = malloc(sizeof(boot_info_t))) == NULL) {
+        return NULL;
+    }
+
+    /* Fill boot drive info */
+    memcpy(boot_info->boot_drive.GUID, drive_GUID, 16);
+
+    /* Convert memory map list to array */
+    if ((mem_map_array = malloc(sizeof(memory_map_entry) * mem_map->count)) ==
+        NULL) {
+        free(boot_info);
+        return NULL;
+    }
+    for (i = 0, mem_map_node = mem_map->list;
+         i < mem_map->count && mem_map_node != NULL;
+         ++i, mem_map_node = mem_map_node->next) {
+        memcpy(
+          &mem_map_array[i], &mem_map_node->entry, sizeof(memory_map_entry));
+    }
+
+    /* Fill memory map info */
+    boot_info->memory_map.entry_size = sizeof(memory_map_entry);
+    boot_info->memory_map.count = mem_map->count;
+    boot_info->memory_map.address = (dword_t)mem_map_array + (get_ds() << 4);
+
+    return boot_info;
+}

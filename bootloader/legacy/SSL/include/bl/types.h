@@ -394,4 +394,47 @@ typedef struct __packed GDTR32 {
     byte_t data[6];
 } GDTR32;
 
+/**
+ * @struct boot_info_t
+ * @brief Boot info, passed to TSL and kernel
+ *
+ * @typedef boot_info_t
+ * @brief boot_info_t type
+ *
+ */
+typedef struct __packed boot_info_t {
+    /**
+     * @brief Booted drive info
+     *
+     */
+    struct {
+        /**
+         * @brief Booted drive GUID
+         *
+         */
+        byte_t GUID[16];
+    } boot_drive;
+    /**
+     * @brief Memory map info
+     *
+     */
+    struct {
+        /**
+         * @brief Count of memory map entries
+         *
+         */
+        dword_t count;
+        /**
+         * @brief Size of each memory map entry
+         *
+         */
+        dword_t entry_size;
+        /**
+         * @brief Physical address to memory map array
+         *
+         */
+        dword_t address;
+    } memory_map;
+} boot_info_t;
+
 #endif /* BL_TYPES_H */

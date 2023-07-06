@@ -101,6 +101,16 @@ get_partition_array(const GPT_header* gpt_hdr);
 GPT_partition_entry*
 find_partition(const GPT_partition_array* partition_array, const byte_t* GUID);
 
+/**
+ * @brief Create a boot info object
+ *
+ * @param drive_GUID GUID of the booted drive
+ * @param mem_map Memory map, returned by \ref get_memory_map
+ * @return Boot info object
+ */
+boot_info_t*
+create_boot_info(const byte_t* drive_GUID, memory_map* mem_map);
+
 /* Leave this undocumented */
 #ifndef DOX_SKIP
 #ifndef NDEBUG

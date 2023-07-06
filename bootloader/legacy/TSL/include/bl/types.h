@@ -44,4 +44,47 @@ typedef uint64_t qword_t;
 typedef enum { false, true } bool;
 #endif /* __bool_true_false_are_defined */
 
+/**
+ * @struct boot_info_t
+ * @brief Boot info, passed to TSL and kernel
+ *
+ * @typedef boot_info_t
+ * @brief boot_info_t type
+ *
+ */
+typedef struct __packed boot_info_t {
+    /**
+     * @brief Booted drive info
+     *
+     */
+    struct {
+        /**
+         * @brief Booted drive GUID
+         *
+         */
+        byte_t GUID[16];
+    } boot_drive;
+    /**
+     * @brief Memory map info
+     *
+     */
+    struct {
+        /**
+         * @brief Count of memory map entries
+         *
+         */
+        dword_t count;
+        /**
+         * @brief Size of each memory map entry
+         *
+         */
+        dword_t entry_size;
+        /**
+         * @brief Physical address to memory map array
+         *
+         */
+        dword_t address;
+    } memory_map;
+} boot_info_t;
+
 #endif /* BL_TYPES_H */

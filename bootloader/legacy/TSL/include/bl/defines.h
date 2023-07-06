@@ -1,6 +1,7 @@
 #ifndef BL_DEFINES_H
 #define BL_DEFINES_H
 
+#define __stdcall __attribute__((stdcall))
 #define __noreturn __attribute__((noreturn))
 #define __packed __attribute__((packed))
 #define __unused __attribute__((unused))

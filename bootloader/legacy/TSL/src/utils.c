@@ -77,3 +77,35 @@ check_cpuid(void) {
                      : "eax", "ebx");
     return !ret;
 }
+
+const char*
+get_cpu_info(dword_t* cpuid_max, dword_t* cpuid_ext_max) {
+    static char cpu_vendor[sizeof(dword_t) * 3 + 1];
+    dword_t eax, ebx, ecx, edx;
+
+    /* Issue CPUID */
+    __asm__("cpuid"
+            : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+            : "a"((dword_t)0x00000000));
+
+    /* Fill cpuid_max */
+    if (cpuid_max) {
+        *cpuid_max = eax;
+    }
+
+    /* Fill cpu_vendor */
+    *(dword_t*)&cpu_vendor[0] = ebx;
+    *(dword_t*)&cpu_vendor[4] = edx;
+    *(dword_t*)&cpu_vendor[8] = ecx;
+    cpu_vendor[sizeof(cpu_vendor) - 1] = '\0';
+
+    /* Issue CPUID */
+    __asm__("cpuid" : "=a"(eax) : "a"((dword_t)1 << 31) : "ebx", "ecx", "edx");
+
+    /* Fill cpuid_ext_max */
+    if (cpuid_ext_max) {
+        *cpuid_ext_max = eax;
+    }
+
+    return cpu_vendor;
+}

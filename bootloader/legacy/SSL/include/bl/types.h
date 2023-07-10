@@ -404,6 +404,11 @@ typedef struct __packed GDTR32 {
  */
 typedef struct __packed boot_info_t {
     /**
+     * @brief Size of this structure
+     *
+     */
+    dword_t size;
+    /**
      * @brief Booted drive info
      *
      */
@@ -433,7 +438,7 @@ typedef struct __packed boot_info_t {
          * @brief Physical address to memory map array
          *
          */
-        dword_t address;
+        qword_t address;
     } memory_map;
 } boot_info_t;
 

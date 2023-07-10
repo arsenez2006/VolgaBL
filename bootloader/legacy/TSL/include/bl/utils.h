@@ -75,4 +75,7 @@ serial_putch(byte_t ch);
 bool
 check_cpuid(void);
 
+const char*
+get_cpu_info(dword_t* cpuid_max, dword_t* cpuid_ext_max);
+
 #endif /* BL_UTILS_H */

@@ -371,6 +371,9 @@ create_boot_info(const byte_t* drive_GUID, memory_map* mem_map) {
         return NULL;
     }
 
+    /* Fill boot info size */
+    boot_info->size = sizeof(boot_info_t);
+
     /* Fill boot drive info */
     memcpy(boot_info->boot_drive.GUID, drive_GUID, 16);
 

@@ -395,6 +395,52 @@ typedef struct __packed GDTR32 {
 } GDTR32;
 
 /**
+ * @struct video_lintext
+ * @brief Linear text video driver info
+ *
+ * @typedef video_lintext
+ * @brief video_lintext type
+ *
+ */
+typedef struct __packed video_lintext {
+    /**
+     * @brief Mode number reported by BIOS
+     *
+     */
+    dword_t mode;
+    /**
+     * @brief Real mode segment of framebuffer
+     *
+     */
+    dword_t seg;
+    /**
+     * @brief Number of columns
+     *
+     */
+    dword_t cols;
+    /**
+     * @brief Number of rows
+     *
+     */
+    dword_t rows;
+} video_lintext;
+
+enum {
+    BOOT_VIDEO_NOVIDEO,
+/**
+ * @brief No video driver was found during boot
+ *
+ */
+#define BOOT_VIDEO_NOVIDEO BOOT_VIDEO_NOVIDEO
+    BOOT_VIDEO_LINTEXT
+/**
+ * @brief Linear text video driver
+ *
+ */
+#define BOOT_VIDEO_LINTEXT BOOT_VIDEO_LINTEXT
+};
+
+/**
  * @struct boot_info_t
  * @brief Boot info, passed to TSL and kernel
  *
@@ -440,6 +486,23 @@ typedef struct __packed boot_info_t {
          */
         qword_t address;
     } memory_map;
+
+    /**
+     * @brief Video info
+     *
+     */
+    struct {
+        /**
+         * @brief Driver type
+         *
+         */
+        dword_t type;
+        /**
+         * @brief Physical address to driver info
+         *
+         */
+        qword_t address;
+    } video_info;
 } boot_info_t;
 
 #endif /* BL_TYPES_H */

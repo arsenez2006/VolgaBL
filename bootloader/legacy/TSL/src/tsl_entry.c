@@ -9,9 +9,6 @@
 #include <bl/types.h>
 #include <bl/utils.h>
 
-/* TODO: Implement graphics printf */
-#define printf serial_printf
-
 /**
  * @brief Print error message to screen
  *
@@ -19,7 +16,7 @@
  */
 static void
 print_error(const char* error_str) {
-    printf("VLGBL Error: %s.\n", error_str);
+    serial_printf("VLGBL Error: %s.\n", error_str);
 }
 
 /**
@@ -48,10 +45,10 @@ tsl_entry(boot_info_t* boot_info) {
 
     /* Get CPU info */
     cpu_vendor = get_cpu_info(&cpuid_max, &cpuid_ext_max);
-    printf("CPU vendor = %s, CPUID max = %#x, CPUID ext max = %#x\n",
-           cpu_vendor,
-           cpuid_max,
-           cpuid_ext_max);
+    serial_printf("CPU vendor = %s, CPUID max = %#x, CPUID ext max = %#x\n",
+                  cpu_vendor,
+                  cpuid_max,
+                  cpuid_ext_max);
 
 halt:
     while (1) {

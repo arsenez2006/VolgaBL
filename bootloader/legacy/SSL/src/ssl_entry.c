@@ -37,6 +37,7 @@ static const byte_t tsl_partition_type[] = {
 static void
 print_error(const char* error_str) {
     printf("VLGBL Error: %s\n", error_str);
+    serial_printf("VLGBL Error: %s\n", error_str);
 }
 
 /**
@@ -47,7 +48,7 @@ print_error(const char* error_str) {
  *          - Load `Third Stage Loader` and kernel partitions to memory
  *          - Get GUID of the booted drive
  *          - Get memory map
- *          - // TODO: Get video modes
+ *          - Get video modes
  *          - // TODO: Enable graphics mode
  *          - Enable A20
  *          - Enable Protected Mode
@@ -219,42 +220,43 @@ ssl_entry(void) {
     dump_memory_map(mem_map);
 
     /* Finalize Second Stage Loader */
-    __asm__ volatile("cli\n"
-                     "movb $0xFF, %%al\n" /* Disable PIC */
-                     "outb %%al, $0xA1\n"
-                     "outb %%al, $0x21\n"
+    __asm__ volatile(
+      "cli\n"
+      "movb $0xFF, %%al\n" /* Disable PIC */
+      "outb %%al, $0xA1\n"
+      "outb %%al, $0x21\n"
 
-                     "movl %%cr0, %%eax\n" /* Set CR0 PE bit */
-                     "orb $1, %%al\n"
-                     "movl %%eax, %%cr0\n"
+      "movl %%cr0, %%eax\n" /* Set CR0 PE bit */
+      "orb $1, %%al\n"
+      "movl %%eax, %%cr0\n"
 
-                     "jmp .pm\n" /* Clear instruction pipeline */
-                     ".pm:\n"
+      "jmp .pm\n" /* Clear instruction pipeline */
+      ".pm:\n"
 
-                     "movw %[data_seg], %%ax\n" /* Set 32bit segments */
-                     "movw %%ax, %%ds\n"
-                     "movw %%ax, %%es\n"
-                     "movw %%ax, %%ss\n"
-                     "movw %%ax, %%fs\n"
-                     "movw %%ax, %%gs\n"
+      "movw %[data_seg], %%ax\n" /* Set 32bit segments */
+      "movw %%ax, %%ds\n"
+      "movw %%ax, %%es\n"
+      "movw %%ax, %%ss\n"
+      "movw %%ax, %%fs\n"
+      "movw %%ax, %%gs\n"
 
-                     "xorl %%eax, %%eax\n" /* Fix stack pointer */
-                     "movw %%cs, %%ax\n"
-                     "shll $4, %%eax\n"
-                     "andl $0xFFFF, %%esp\n"
-                     "addl %%eax, %%esp\n"
+      "xorl %%eax, %%eax\n" /* Fix stack pointer */
+      "movw %%cs, %%ax\n"
+      "shll $4, %%eax\n"
+      "andl $0xFFFF, %%esp\n"
+      "addl %%eax, %%esp\n"
 
-                     "movb $0xE9, (0x0000)\n" /* Make jump stub */
-                     "movl %[jmp_addr], (0x0001)\n"
+      "movb $0xE9, (0x0000)\n" /* Make jump stub */
+      "movl %[jmp_addr], (0x0001)\n"
 
-                     "pushl %[boot_info]\n"
-                     "ljmp %[code_seg],$0x0000" /* Jump to Third Stage Loader */
-                     :
-                     : [data_seg] "rmN"((word_t)2 * sizeof(GDT32_entry)),
-                       [jmp_addr] "rmN"((dword_t)TSL_ADDR - 5),
-                       [code_seg] "N"((word_t)1 * sizeof(GDT32_entry)),
-                       [boot_info] "rmN"((dword_t)boot_info + (get_ds() << 4))
-                     : "eax");
+      "pushl %[boot_info]\n"
+      "ljmp %[code_seg],$0x0000" /* Jump to Third Stage Loader */
+      :
+      : [data_seg] "rmN"((word_t)2 * sizeof(GDT32_entry)),
+        [jmp_addr] "rmN"((dword_t)TSL_ADDR - 5),
+        [code_seg] "N"((word_t)1 * sizeof(GDT32_entry)),
+        [boot_info] "rmN"((dword_t)boot_info + ((dword_t)get_ds() << 4))
+      : "eax");
 
 halt:
     while (1) {

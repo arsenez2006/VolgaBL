@@ -90,6 +90,23 @@ typedef struct __packed boot_info_t {
          */
         qword_t address;
     } memory_map;
+
+    /**
+     * @brief Video info
+     *
+     */
+    struct {
+        /**
+         * @brief Driver type
+         *
+         */
+        dword_t type;
+        /**
+         * @brief Physical address to driver info
+         *
+         */
+        qword_t address;
+    } video_info;
 } boot_info_t;
 
 #endif /* BL_TYPES_H */

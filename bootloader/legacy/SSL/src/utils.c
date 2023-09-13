@@ -360,11 +360,51 @@ find_partition(const GPT_partition_array* partition_array, const byte_t* GUID) {
     return NULL;
 }
 
+static bool
+_query_video_bios(dword_t* type, dword_t* address) {
+    video_lintext* video_info;
+    word_t ax, bx;
+    byte_t cf;
+
+    __asm__ volatile("int $0x10"
+                     : "=a"(ax), "=b"(bx), "=ccc"(cf)
+                     : "a"((word_t)0x0F00));
+
+    if (cf) {
+        return false;
+    } else {
+        if ((video_info = malloc(sizeof(video_lintext))) == NULL) {
+            return false;
+        }
+        video_info->mode = ax & 0xFF;
+        video_info->seg = 0xB800;
+        video_info->cols = (ax >> 8) & 0xFF;
+        video_info->rows = 25;
+
+        *type = BOOT_VIDEO_LINTEXT;
+        *address = (dword_t)video_info;
+        return true;
+    }
+}
+
+static void
+_query_video(dword_t* type, dword_t* address) {
+    dword_t ret_type = BOOT_VIDEO_NOVIDEO;
+    dword_t ret_addr = 0;
+
+    _query_video_bios(&ret_type, &ret_addr);
+
+    *type = ret_type;
+    *address = ret_addr;
+}
+
 boot_info_t*
 create_boot_info(const byte_t* drive_GUID, memory_map* mem_map) {
     boot_info_t* boot_info;
     memory_map_entry* mem_map_array;
     memory_map_node* mem_map_node;
+    dword_t video_type;
+    dword_t video_addr;
     size_t i;
 
     if ((boot_info = malloc(sizeof(boot_info_t))) == NULL) {
@@ -393,7 +433,13 @@ create_boot_info(const byte_t* drive_GUID, memory_map* mem_map) {
     /* Fill memory map info */
     boot_info->memory_map.entry_size = sizeof(memory_map_entry);
     boot_info->memory_map.count = mem_map->count;
-    boot_info->memory_map.address = (dword_t)mem_map_array + (get_ds() << 4);
+    boot_info->memory_map.address =
+      (dword_t)mem_map_array + ((dword_t)get_ds() << 4);
+
+    /* Fill video info */
+    _query_video(&video_type, &video_addr);
+    boot_info->video_info.type = video_type;
+    boot_info->video_info.address = video_addr + ((dword_t)get_ds() << 4);
 
     return boot_info;
 }

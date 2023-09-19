@@ -8,6 +8,10 @@
 #include <bl/io.h>
 #include <bl/types.h>
 #include <bl/utils.h>
+#include <bl/string.h>
+
+static qword_t pml4[512] __align(1 << 12);
+static qword_t pml3[512] __align(1 << 12);
 
 /**
  * @brief Print error message to screen
@@ -28,12 +32,11 @@ print_error(const char* error_str) {
  */
 void __stdcall __noreturn
 tsl_entry(boot_info_t* boot_info) {
-    dword_t cpuid_max, cpuid_ext_max;
-    const char* cpu_vendor;
+    size_t i;
 
     /* Verify boot info size */
     if (boot_info->size != sizeof(boot_info_t)) {
-        print_error("Boot info is corrupted");
+        print_error("Boot info is outdated");
         goto halt;
     }
 
@@ -43,12 +46,33 @@ tsl_entry(boot_info_t* boot_info) {
         goto halt;
     }
 
-    /* Get CPU info */
-    cpu_vendor = get_cpu_info(&cpuid_max, &cpuid_ext_max);
-    serial_printf("CPU vendor = %s, CPUID max = %#x, CPUID ext max = %#x\n",
-                  cpu_vendor,
-                  cpuid_max,
-                  cpuid_ext_max);
+    /* Query CPU compatibility */
+    if (!check_cpu_compat()) {
+        print_error("CPU is not compatible");
+        goto halt;
+    }
+
+    /* Enable Physical Address Extension */
+    enable_PAE();
+
+    /* Clear page tables */
+    memset(pml4, 0, sizeof pml4);
+    memset(pml3, 0, sizeof pml3);
+
+    /* Identity map first 4GB of RAM */
+    for (i = 0; i < 4; ++i) {
+        pml3[i] = ((qword_t)i << 30) | 0x83;
+    }
+    pml4[0] = (qword_t)(uintptr_t)pml3 | 0x3;
+
+    /* Load page table */
+    load_page_table(pml4);
+
+    /* Enable Long Mode */
+    enable_long_mode();
+
+    /* Enable Paging */
+    enable_paging();
 
 halt:
     while (1) {

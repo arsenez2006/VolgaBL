@@ -6,9 +6,9 @@
  */
 #include <bl/defines.h>
 #include <bl/io.h>
+#include <bl/string.h>
 #include <bl/types.h>
 #include <bl/utils.h>
-#include <bl/string.h>
 
 static qword_t pml4[512] __align(1 << 12);
 static qword_t pml3[512] __align(1 << 12);

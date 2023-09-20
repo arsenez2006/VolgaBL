@@ -209,6 +209,12 @@ ssl_entry(void) {
         goto halt;
     }
 
+    /* Load Kernel */
+    if (!load_kernel(kernel_partition, 0x100000)) {
+        print_error("Failed to load kernel");
+        goto halt;
+    }
+
     /* Create boot info */
     if ((boot_info = create_boot_info(drive_GUID, mem_map)) == NULL) {
         print_error("Failed to create boot info");

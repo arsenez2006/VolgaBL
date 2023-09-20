@@ -398,6 +398,39 @@ _query_video(dword_t* type, dword_t* address) {
     *address = ret_addr;
 }
 
+bool
+load_kernel(const GPT_partition_entry* partition, dword_t address) {
+    void* buffer;
+    DAP read_context;
+    qword_t i;
+    qword_t sectors_count = partition->end_lba - partition->start_lba + 1;
+
+    address -= (dword_t)get_ds() << 4;
+
+    if ((buffer = malloc(SECTOR_SIZE)) == NULL) {
+        return false;
+    }
+
+    read_context.size = sizeof(DAP);
+    read_context.rsv = 0;
+    read_context.sectors = 1;
+    read_context.segment = get_ds();
+    read_context.offset = (word_t)(uintptr_t)buffer;
+    read_context.lba = partition->start_lba;
+
+    for (i = 0; i < sectors_count; ++i) {
+        if (!bios_read_drive(&read_context)) {
+            free(buffer);
+            return false;
+        }
+        memcpy((byte_t*)address + (i * SECTOR_SIZE), buffer, SECTOR_SIZE);
+        ++read_context.lba;
+    }
+
+    free(buffer);
+    return true;
+}
+
 boot_info_t*
 create_boot_info(const byte_t* drive_GUID, memory_map* mem_map) {
     boot_info_t* boot_info;

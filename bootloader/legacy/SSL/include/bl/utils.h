@@ -102,6 +102,17 @@ GPT_partition_entry*
 find_partition(const GPT_partition_array* partition_array, const byte_t* GUID);
 
 /**
+ * @brief Loads kernel partition from drive
+ *
+ * @param partition Kernel partition
+ * @param address Where to load kernel
+ * @return true on success
+ * @return false on failure
+ */
+bool
+load_kernel(const GPT_partition_entry* partition, dword_t address);
+
+/**
  * @brief Create a boot info object
  *
  * @param drive_GUID GUID of the booted drive

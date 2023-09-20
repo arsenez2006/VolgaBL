@@ -45,6 +45,19 @@ function(create_image)
     # Save into file
     file(WRITE ${MAP_FILE} ${MAP})
 
+    # Get Kernel map entry
+    file(STRINGS ${MAP_FILE} KERNEL_MAP_ENTRY REGEX "type=78A9E598-3638-4D67-B2EB-0123D0AFBDBD")
+    string(REGEX MATCH "start=[0-9]+" KERNEL_START_ENTRY ${KERNEL_MAP_ENTRY})
+    string(REGEX MATCH "size=[0-9]+" KERNEL_SIZE_ENTRY ${KERNEL_MAP_ENTRY})
+    string(REGEX MATCH "[0-9]+" OUTPUT_KERNEL_OFFSET ${KERNEL_START_ENTRY})
+    string(REGEX MATCH "[0-9]+" OUTPUT_KERNEL_SIZE ${KERNEL_SIZE_ENTRY})
+    set(OUTPUT_KERNEL_BS 512)
+
+    # Set variables for the caller
+    set(OUTPUT_KERNEL_BS ${OUTPUT_KERNEL_BS} PARENT_SCOPE)
+    set(OUTPUT_KERNEL_OFFSET ${OUTPUT_KERNEL_OFFSET} PARENT_SCOPE)
+    set(OUTPUT_KERNEL_SIZE ${OUTPUT_KERNEL_SIZE} PARENT_SCOPE)
+
     # Get bootloader variables
     if(VLGBL_LEGACY)
         # Get map entries

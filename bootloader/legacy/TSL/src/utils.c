@@ -182,3 +182,61 @@ enable_paging(void) {
                      :
                      : "eax");
 }
+
+static dword_t
+_pci_read_reg(byte_t bus, byte_t device, byte_t func, byte_t reg) {
+    dword_t address = ((dword_t)1 << 31) | ((dword_t)bus << 16) |
+                      ((dword_t)device << 11) | ((dword_t)func << 8) |
+                      ((dword_t)reg * 0x4);
+
+    outl(0xCF8, address);
+    return inl(0xCFC);
+}
+
+static void
+_pci_write_reg(byte_t bus,
+               byte_t device,
+               byte_t func,
+               byte_t reg,
+               dword_t value) {
+    dword_t address = ((dword_t)1 << 31) | ((dword_t)bus << 16) |
+                      ((dword_t)device << 11) | ((dword_t)func << 8) |
+                      ((dword_t)reg * 0x4);
+
+    outl(0xCF8, address);
+    outl(0xCFC, value);
+}
+
+static word_t
+_pci_get_vendor(byte_t bus, byte_t device, byte_t func) {
+    return (word_t)(_pci_read_reg(bus, device, func, 0x0) & 0xFFFF);
+}
+
+static byte_t
+_pci_get_type(byte_t bus, byte_t device, byte_t func) {
+    return (byte_t)((_pci_read_reg(bus, device, func, 0x3) >> 16) & 0xFF);
+}
+
+void
+disable_pci(void) {
+    size_t bus, device, func;
+    dword_t reg;
+
+    for (bus = 0; bus < 256; ++bus) {
+        for (device = 0; device < 32; ++device) {
+            if (_pci_get_vendor(bus, device, 0) != 0xFFFF) {
+                reg = _pci_read_reg(bus, device, 0, 0x1);
+                reg &= 0xFFFFFFFC;
+                _pci_write_reg(bus, device, 0, 0x1, reg);
+
+                if (_pci_get_type(bus, device, 0) & 0x80) {
+                    for (func = 1; func < 8; ++func) {
+                        reg = _pci_read_reg(bus, device, func, 0x1);
+                        reg &= 0xFFFFFFFC;
+                        _pci_write_reg(bus, device, func, 0x1, reg);
+                    }
+                }
+            }
+        }
+    }
+}

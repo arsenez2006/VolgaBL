@@ -74,6 +74,9 @@ tsl_entry(boot_info_t* boot_info) {
     /* Enable Paging */
     enable_paging();
 
+    /* Disable all PCI devices */
+    disable_pci();
+
 halt:
     while (1) {
         __asm__ volatile("hlt");

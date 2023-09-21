@@ -119,4 +119,11 @@ enable_long_mode(void);
 void
 enable_paging(void);
 
+/**
+ * @brief Disables all PCI devices
+ *
+ */
+void
+disable_pci(void);
+
 #endif /* BL_UTILS_H */

@@ -503,6 +503,18 @@ typedef struct __packed boot_info_t {
          */
         qword_t address;
     } video_info;
+
+    /**
+     * @brief ACPI tables
+     *
+     */
+    struct {
+        /**
+         * @brief Address of RSDP
+         *
+         */
+        qword_t rsdp;
+    } ACPI;
 } boot_info_t;
 
 #endif /* BL_TYPES_H */

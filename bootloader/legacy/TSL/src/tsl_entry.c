@@ -77,6 +77,17 @@ tsl_entry(boot_info_t* boot_info) {
     /* Disable all PCI devices */
     disable_pci();
 
+    /* Find ACPI RSDP table*/
+    for (i = 0xE0000; i < 0xFFFFF; ++i) {
+        if (!memcmp((void*)i, "RSD PTR ", 8)) {
+            break;
+        }
+    }
+    if (i == 0xFFFFF) {
+        print_error("Failed to find ACPI tables");
+    }
+    boot_info->ACPI.rsdp = i;
+
 halt:
     while (1) {
         __asm__ volatile("hlt");

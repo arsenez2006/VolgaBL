@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(${MBR_TARGET}
-    LANGUAGES ASM_NASM
     DESCRIPTION "Main Boot Record"
+    LANGUAGES ASM_NASM
 )
 
 # MBR sources

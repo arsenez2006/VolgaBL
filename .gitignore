@@ -2,7 +2,9 @@
 .vscode
 .cache
 .clangd
-build
-docs
+/build
+/docs
+node_modules
+package-lock.json
 *.sh
 *.bin

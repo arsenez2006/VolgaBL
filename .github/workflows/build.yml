@@ -1,0 +1,19 @@
+name: Build
+on: 
+  push:
+    branches:
+      - "master"
+      - "dev"
+  pull_request:
+    branches:
+      - "master"
+      - "dev"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@4
+
+      - name: Install dependencies
+        uses: ./.github/actions/depend

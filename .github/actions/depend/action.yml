@@ -1,0 +1,5 @@
+name: Install dependencies action
+description: Installs dependencies
+runs:
+  using: node20
+  main: dist/index.js

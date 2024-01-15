@@ -16,8 +16,7 @@
  * @param [in] port Port number
  * @return The byte
  */
-byte_t
-inb(word_t port);
+byte_t  inb(word_t port);
 
 /**
  * @brief Read word from the port
@@ -25,8 +24,7 @@ inb(word_t port);
  * @param [in] port Port number
  * @return The word
  */
-word_t
-inw(word_t port);
+word_t  inw(word_t port);
 
 /**
  * @brief Read dword from the port
@@ -34,8 +32,7 @@ inw(word_t port);
  * @param [in] port Port number
  * @return The dword
  */
-dword_t
-inl(word_t port);
+dword_t inl(word_t port);
 
 /**
  * @brief Send byte to the port
@@ -43,8 +40,7 @@ inl(word_t port);
  * @param [in] port Port number
  * @param [in] val Byte
  */
-void
-outb(word_t port, byte_t val);
+void    outb(word_t port, byte_t val);
 
 /**
  * @brief Send word to the port
@@ -52,8 +48,7 @@ outb(word_t port, byte_t val);
  * @param [in] port Port number
  * @param [in] val Word
  */
-void
-outw(word_t port, word_t val);
+void    outw(word_t port, word_t val);
 
 /**
  * @brief Send dword to the port
@@ -61,16 +56,14 @@ outw(word_t port, word_t val);
  * @param [in] port Port number
  * @param [in] val Dword
  */
-void
-outl(word_t port, dword_t val);
+void    outl(word_t port, dword_t val);
 
 /**
  * @brief Print character to COM port
  *
  * @param [in] ch ASCII character to print
  */
-void
-serial_putch(byte_t ch);
+void    serial_putch(byte_t ch);
 
 /**
  * @brief Checks if CPUID available
@@ -78,8 +71,7 @@ serial_putch(byte_t ch);
  * @return true - CPUID is available
  * @return false - CPUID is not available
  */
-bool
-check_cpuid(void);
+bool    check_cpuid(void);
 
 /**
  * @brief Checks CPU extensions
@@ -87,43 +79,37 @@ check_cpuid(void);
  * @return true - all required extensions are present
  * @return false - some of the extensions are not implemented
  */
-bool
-check_cpu_compat(void);
+bool    check_cpu_compat(void);
 
 /**
  * @brief Enables Physical Address Extension
  *
  */
-void
-enable_PAE(void);
+void    enable_PAE(void);
 
 /**
  * @brief Loads page table in CR3
  *
  * @param address Physical address of the page table
  */
-void
-load_page_table(void* address);
+void    load_page_table(void* address);
 
 /**
  * @brief Enables Long Mode
  *
  */
-void
-enable_long_mode(void);
+void    enable_long_mode(void);
 
 /**
  * @brief Enables paging
  *
  */
-void
-enable_paging(void);
+void    enable_paging(void);
 
 /**
  * @brief Disables all PCI devices
  *
  */
-void
-disable_pci(void);
+void    disable_pci(void);
 
 #endif /* BL_UTILS_H */

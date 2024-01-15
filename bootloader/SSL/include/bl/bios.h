@@ -19,36 +19,36 @@
  *
  */
 typedef struct __packed DAP {
-    /**
-     * @brief Size of the DAP. Must be 16 or sizeof(DAP)
-     *
-     */
-    byte_t size;
-    /**
-     * @brief Reserved. Always 0
-     *
-     */
-    byte_t rsv;
-    /**
-     * @brief Number of sectors to read/write. Maximum value is 128
-     *
-     */
-    word_t sectors;
-    /**
-     * @brief Read/Write buffer offset in the segment
-     *
-     */
-    word_t offset;
-    /**
-     * @brief Read/Write buffer segment
-     *
-     */
-    word_t segment;
-    /**
-     * @brief LBA of the drive
-     *
-     */
-    qword_t lba;
+  /**
+   * @brief Size of the DAP. Must be 16 or sizeof(DAP)
+   *
+   */
+  byte_t  size;
+  /**
+   * @brief Reserved. Always 0
+   *
+   */
+  byte_t  rsv;
+  /**
+   * @brief Number of sectors to read/write. Maximum value is 128
+   *
+   */
+  word_t  sectors;
+  /**
+   * @brief Read/Write buffer offset in the segment
+   *
+   */
+  word_t  offset;
+  /**
+   * @brief Read/Write buffer segment
+   *
+   */
+  word_t  segment;
+  /**
+   * @brief LBA of the drive
+   *
+   */
+  qword_t lba;
 } DAP;
 
 /**
@@ -61,41 +61,41 @@ typedef struct __packed DAP {
  *
  */
 typedef struct __packed drive_parameteres {
-    /**
-     * @brief Size of the result buffer. Must be 26 or sizeof(drive_parameteres)
-     *
-     */
-    word_t size;
-    /**
-     * @brief Information flags
-     *
-     */
-    word_t flags;
-    /**
-     * @brief Physical number of cylinders
-     *
-     */
-    dword_t cylinders;
-    /**
-     * @brief Physical number of heads
-     *
-     */
-    dword_t heads;
-    /**
-     * @brief Physical number of sectors per track
-     *
-     */
-    dword_t sectors;
-    /**
-     * @brief Absolute number of sectors
-     *
-     */
-    qword_t count_of_sectors;
-    /**
-     * @brief Bytes per sector
-     *
-     */
-    word_t sector_size;
+  /**
+   * @brief Size of the result buffer. Must be 26 or sizeof(drive_parameteres)
+   *
+   */
+  word_t  size;
+  /**
+   * @brief Information flags
+   *
+   */
+  word_t  flags;
+  /**
+   * @brief Physical number of cylinders
+   *
+   */
+  dword_t cylinders;
+  /**
+   * @brief Physical number of heads
+   *
+   */
+  dword_t heads;
+  /**
+   * @brief Physical number of sectors per track
+   *
+   */
+  dword_t sectors;
+  /**
+   * @brief Absolute number of sectors
+   *
+   */
+  qword_t count_of_sectors;
+  /**
+   * @brief Bytes per sector
+   *
+   */
+  word_t  sector_size;
 } drive_parameteres;
 
 /**
@@ -103,8 +103,7 @@ typedef struct __packed drive_parameteres {
  *
  * @param [in] ch ASCII character to print
  */
-void
-bios_putch(byte_t ch);
+void             bios_putch(byte_t ch);
 
 /**
  * @brief Read drive using BIOS int 13h
@@ -114,8 +113,7 @@ bios_putch(byte_t ch);
  * @return true on success
  * @return false on failure
  */
-bool __check_ret
-bios_read_drive(const DAP* read_context);
+bool __check_ret bios_read_drive(const DAP* read_context);
 
 /**
  * @brief Get drive parameteres, using BIOS int 13h
@@ -124,8 +122,7 @@ bios_read_drive(const DAP* read_context);
  * @return true on success
  * @return false on failure
  */
-bool __check_ret
-bios_get_drive_parameteres(drive_parameteres* buffer);
+bool __check_ret bios_get_drive_parameteres(drive_parameteres* buffer);
 
 /**
  * @brief Get E820 memory map entry, using BIOS int 15h
@@ -139,8 +136,7 @@ bios_get_drive_parameteres(drive_parameteres* buffer);
  * @return true on success
  * @return false on failure
  */
-bool __check_ret
-bios_get_e820(dword_t* offset, dword_t buf_size, void* buffer);
+bool __check_ret bios_get_e820(dword_t* offset, dword_t buf_size, void* buffer);
 
 /**
  * @brief Initialize COM port, using BIOS int 14h
@@ -148,15 +144,13 @@ bios_get_e820(dword_t* offset, dword_t buf_size, void* buffer);
  * @return true on success
  * @return false on failure
  */
-bool
-bios_serial_init(void);
+bool             bios_serial_init(void);
 
 /**
  * @brief Print character to COM port, using BIOS int 14h
  *
  * @param [in] ch ASCII character to print
  */
-void
-bios_serial_putch(byte_t ch);
+void             bios_serial_putch(byte_t ch);
 
 #endif /* BL_BIOS_H */

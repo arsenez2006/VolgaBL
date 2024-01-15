@@ -15,8 +15,7 @@
  * @return true on success
  * @return false on failure
  */
-bool __check_ret
-mem_init(void);
+bool __check_ret  mem_init(void);
 
 /**
  * @brief Allocate memory
@@ -25,8 +24,7 @@ mem_init(void);
  * @return  Pointer to allocated block\n
  *          NULL on failure
  */
-void* __check_ret
-malloc(size_t count);
+void* __check_ret malloc(size_t count);
 
 /**
  * @brief Reallocate memory
@@ -36,16 +34,14 @@ malloc(size_t count);
  * @return  Pointer to the reallocated block
  *          NULL on failure
  */
-void* __check_ret
-realloc(void* mem, size_t new_size);
+void* __check_ret realloc(void* mem, size_t new_size);
 
 /**
  * @brief Free memory block
  *
  * @param [in] mem Pointer to the block
  */
-void
-free(void* mem);
+void              free(void* mem);
 
 /**
  * @brief Get the \ref memory_map "memory map" object
@@ -53,7 +49,6 @@ free(void* mem);
  * @return  Pointer to the \ref memory_map "memory map" object
  *          NULL on failure
  */
-memory_map*
-get_memory_map(void);
+memory_map*       get_memory_map(void);
 
 #endif /* BL_MEM_H */

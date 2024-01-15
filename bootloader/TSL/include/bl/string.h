@@ -15,8 +15,7 @@
  * @param [in] str Pointer to the null-terminated byte string to be examined
  * @return The length of the null-terminated byte string str.
  */
-size_t __check_ret
-strlen(const char* str);
+size_t __check_ret strlen(char const* str);
 
 /**
  * @brief Compares two buffers
@@ -26,8 +25,7 @@ strlen(const char* str);
  * @param [in] count Number of bytes to examine
  * @return Zero if lhs and rhs compare equal, or if count is zero.
  */
-int __check_ret
-memcmp(const void* lhs, const void* rhs, size_t count);
+int __check_ret    memcmp(void const* lhs, void const* rhs, size_t count);
 
 /**
  * @brief Copies one buffer to another
@@ -37,8 +35,7 @@ memcmp(const void* lhs, const void* rhs, size_t count);
  * @param [in] count Number of bytes to copy
  * @return dest
  */
-void*
-memcpy(void* dest, const void* src, size_t count);
+void*              memcpy(void* dest, void const* src, size_t count);
 
 /**
  * @brief Fills a buffer with a character
@@ -48,7 +45,6 @@ memcpy(void* dest, const void* src, size_t count);
  * @param [in] count Number of bytes to fill
  * @return ptr
  */
-void*
-memset(void* ptr, int val, size_t count);
+void*              memset(void* ptr, int val, size_t count);
 
 #endif /* BL_STRING_H */

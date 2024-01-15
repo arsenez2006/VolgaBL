@@ -8,6 +8,7 @@
 ## Building
 ### Dependencies
 * CMake 3.20+
+* GCC
 * NASM
 * Doxygen (optional)
 

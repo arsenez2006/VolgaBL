@@ -8,6 +8,7 @@
 #define BL_IO_H
 
 #include "types.h"
+
 #include <stdarg.h>
 
 /**
@@ -21,8 +22,7 @@
  * @return The number of characters that would have been written if n had been
  * sufficiently large, not counting the terminating null character
  */
-int
-vsnprintf(char* s, size_t n, const char* format, va_list arg);
+int vsnprintf(char* s, size_t n, char const* format, va_list arg);
 
 /**
  * @brief Write formatted output to sized buffer
@@ -34,7 +34,7 @@ vsnprintf(char* s, size_t n, const char* format, va_list arg);
  * @return The number of characters that would have been written if n had been
  * sufficiently large, not counting the terminating null character
  */
-int __print_fmt(3, 4) snprintf(char* s, size_t n, const char* format, ...);
+int __print_fmt(3, 4) snprintf(char* s, size_t n, char const* format, ...);
 
 /**
  * @brief Write formatted data to string
@@ -45,7 +45,7 @@ int __print_fmt(3, 4) snprintf(char* s, size_t n, const char* format, ...);
  * @return The number of characters that would have been written if n had been
  * sufficiently large, not counting the terminating null character
  */
-int __print_fmt(2, 3) sprintf(char* s, const char* format, ...);
+int __print_fmt(2, 3) sprintf(char* s, char const* format, ...);
 
 /**
  * @brief Print formatted data to terminal
@@ -55,7 +55,7 @@ int __print_fmt(2, 3) sprintf(char* s, const char* format, ...);
  * @return The number of characters that would have been written if n had been
  * sufficiently large, not counting the terminating null character
  */
-int __print_fmt(1, 2) printf(const char* format, ...);
+int __print_fmt(1, 2) printf(char const* format, ...);
 
 /**
  * @brief Print formatted data to COM port
@@ -65,6 +65,6 @@ int __print_fmt(1, 2) printf(const char* format, ...);
  * @return The number of characters that would have been written if n had been
  * sufficiently large, not counting the terminating null character
  */
-int __print_fmt(1, 2) serial_printf(const char* format, ...);
+int __print_fmt(1, 2) serial_printf(char const* format, ...);
 
 #endif /* BL_IO_H */

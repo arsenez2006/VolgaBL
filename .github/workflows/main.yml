@@ -16,6 +16,13 @@ jobs:
           ref: ${{ github.head_ref }}
           path: src
 
+      - name: Install dependencies
+        uses: arsenez2006/depend@v1.1.0
+        with:
+          cache: true
+          doxygen: true
+          nasm: true
+
       - name: Configure CMake
         run: |
           mkdir -p ${{ env.BUILD_DIR }}

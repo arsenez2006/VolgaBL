@@ -1,26 +1,33 @@
 cmake_minimum_required(VERSION 3.20)
-include(cmake/toolchain.cmake)
-include(cmake/create_image.cmake)
-enable_language(C ASM_NASM)
-project(VolgaOS)
 
+# Include CMake scripts
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
+include(cmake/flags.cmake)
+include(cmake/toolchain.cmake)
 
+project(VolgaBL
+    DESCRIPTION "VolgaOS legacy bootloader"
+    HOMEPAGE_URL "https://github.com/arsenez2006/VolgaBL"
+    LANGUAGES C ASM_NASM
+)
+
+# Find dependencies
 find_dependencies()
-
-create_image()
 
 # Compile bootloader
 add_subdirectory(bootloader)
 
-# Target for buiilding docs
 if(BUILD_DOCS)
-    add_custom_target(docs
-        DEPENDS VLGBL_docs
-    )
-endif(BUILD_DOCS)
+    set(DEPS bootloader bootloader_docs)
+else()
+    set(DEPS bootloader)
+endif()
 
+# Copy target files
 add_custom_target(${PROJECT_NAME} ALL
-    DEPENDS VLGBL
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${MBR_TARGET}> ${OUTPUT}/${MBR_TARGET}
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${SSL_TARGET}> ${OUTPUT}/${SSL_TARGET}
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${TSL_TARGET}> ${OUTPUT}/${TSL_TARGET}
+    DEPENDS ${DEPS}
 )

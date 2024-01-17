@@ -39,6 +39,14 @@ list(APPEND C_x86_32
     "-m32"
 )
 
+list(APPEND ASM_OPTIMIZATION
+    "-Ox"
+)
+
+list(APPEND ASM_GENERATION
+    "-felf32"
+)
+
 list(APPEND LINK_FLAGS 
     "-nostartfiles"
     "-nodefaultlibs"
@@ -47,13 +55,3 @@ list(APPEND LINK_FLAGS
     "-s"
     "-static"
 )
-
-# Flags for 16bit target
-set(ASM_FLAGS_16 "-Ox -f elf32")
-set(C_FLAGS_16 ${C_DIALECT} ${C_OPTIMIZATION} ${C_INSTRUMENTATION} ${C_GENERATION} ${C_x86_16})
-set(LINK_FLAGS_16 ${C_FLAGS_16} ${LINK_FLAGS})
-
-# Flags for 32bit target
-set(ASM_FLAGS_32 "-Ox -f elf32")
-set(C_FLAGS_32 ${C_DIALECT} ${C_OPTIMIZATION} ${C_INSTRUMENTATION} ${C_GENERATION} ${C_x86_32})
-set(LINK_FLAGS_32 ${C_FLAGS_32} ${LINK_FLAGS})

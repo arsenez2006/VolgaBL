@@ -114,6 +114,22 @@ bool         load_kernel(GPT_partition_entry const* partition, dword_t address);
  */
 boot_info_t* create_boot_info(byte_t const* drive_GUID, memory_map* mem_map);
 
+/**
+ * @brief Checks if CPUID available
+ *
+ * @return true - CPUID is available
+ * @return false - CPUID is not available
+ */
+bool         check_cpuid(void);
+
+/**
+ * @brief Checks CPU extensions
+ *
+ * @return true - all required extensions are present
+ * @return false - some of the extensions are not implemented
+ */
+bool         check_cpu_compat(void);
+
 /* Leave this undocumented */
 #ifndef DOX_SKIP
 #  ifndef NDEBUG

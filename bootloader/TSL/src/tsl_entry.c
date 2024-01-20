@@ -38,18 +38,6 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
     goto halt;
   }
 
-  /* Check CPUID presence */
-  if (!check_cpuid()) {
-    print_error("CPUID is not presented");
-    goto halt;
-  }
-
-  /* Query CPU compatibility */
-  if (!check_cpu_compat()) {
-    print_error("CPU is not compatible");
-    goto halt;
-  }
-
   /* Enable Physical Address Extension */
   enable_PAE();
 

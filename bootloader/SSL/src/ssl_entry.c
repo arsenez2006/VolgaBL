@@ -77,6 +77,18 @@ void __noreturn ssl_entry(void) {
   /* Initialize COM port */
   (void)bios_serial_init();
 
+  /* Check CPUID presence */
+  if (!check_cpuid()) {
+    print_error("CPUID in not presented");
+    goto halt;
+  }
+
+  /* Query CPU compatibility */
+  if (!check_cpu_compat()) {
+    print_error("CPU is not compatible");
+    goto halt;
+  }
+
   /* Enable A20 line */
   if (!enable_A20()) {
     print_error("Failed to enable A20");

@@ -460,3 +460,86 @@ boot_info_t* create_boot_info(byte_t const* drive_GUID, memory_map* mem_map) {
 
   return boot_info;
 }
+
+bool check_cpuid(void) {
+  bool ret;
+  __asm__ volatile(
+      "pushfl\n"
+      "popl %%eax\n" /* Move EFLAGS to EAX */
+
+      "movl %%eax, %%ebx\n" /* Save original EFLAGS to EBX*/
+
+      "xorl $0x200000, %%eax\n" /* Change ID bit */
+
+      "pushl %%eax\n"
+      "popfl\n" /* Load Updated EFLAGS */
+
+      "pushfl\n"
+      "popl %%eax\n" /* Move Updated EFLAGS to EAX */
+
+      "xorl %%eax, %%ebx" /* Check ID bit */
+      : "=@ccz"(ret)
+      :
+      : "eax", "ebx"
+  );
+  return !ret;
+}
+
+static void _cpuid(dword_t* eax, dword_t* ebx, dword_t* ecx, dword_t* edx) {
+  __asm__("cpuid"
+          : "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx)
+          : "a"(*eax));
+}
+
+/* CPUID EAX = 1: EDX */
+#define CPUID_PSE     (1 << 3)
+#define CPUID_MSR     (1 << 5)
+#define CPUID_PAE     (1 << 6)
+#define CPUID_APIC    (1 << 9)
+#define CPUID_PGE     (1 << 13)
+#define CPUID_PAT     (1 << 16)
+#define CPUID_ACPI    (1 << 22)
+
+/* CPUID EAX = 1: ECX */
+#define CPUID_SSE3    (1 << 0)
+#define CPUID_SSE41   (1 << 19)
+#define CPUID_SSE42   (1 << 20)
+#define CPUID_x2APIC  (1 << 21)
+#define CPUID_AVX     (1 << 28)
+
+/* CPUID EAX = 0x80000001: EDX */
+#define CPUID_SYSCALL (1 << 11)
+#define CPUID_NX      (1 << 20)
+#define CPUID_PG1G    (1 << 26)
+#define CPUID_LM      (1 << 29)
+
+bool check_cpu_compat(void) {
+  dword_t eax, ebx, ecx, edx;
+  dword_t cpuid_max, cpuid_ext_max;
+
+  eax = 0;
+  _cpuid(&eax, &ebx, &ecx, &edx);
+  cpuid_max = eax;
+
+  eax       = 0x80000000;
+  _cpuid(&eax, &ebx, &ecx, &edx);
+  cpuid_ext_max = eax;
+
+  if (cpuid_max < 1 && cpuid_ext_max < 0x80000001) {
+    return false;
+  }
+
+  eax = 1;
+  _cpuid(&eax, &ebx, &ecx, &edx);
+  if (!(edx & CPUID_PAE)) {
+    return false;
+  }
+
+  eax = 0x80000001;
+  _cpuid(&eax, &ebx, &ecx, &edx);
+  if (!(edx & CPUID_LM) || !(edx & CPUID_PG1G)) {
+    return false;
+  }
+
+  return true;
+}

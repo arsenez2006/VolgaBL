@@ -417,7 +417,9 @@ bool load_kernel(GPT_partition_entry const* partition, dword_t address) {
   return true;
 }
 
-boot_info_t* create_boot_info(byte_t const* drive_GUID, memory_map* mem_map) {
+boot_info_t* create_boot_info(
+    byte_t const* drive_GUID, memory_map* mem_map, qword_t ramfs_addr
+) {
   boot_info_t*      boot_info;
   memory_map_entry* mem_map_array;
   memory_map_node*  mem_map_node;
@@ -457,6 +459,9 @@ boot_info_t* create_boot_info(byte_t const* drive_GUID, memory_map* mem_map) {
   _query_video(&video_type, &video_addr);
   boot_info->video_info.type    = video_type;
   boot_info->video_info.address = video_addr + ((dword_t)get_ds() << 4);
+
+  /* Fill RAMFS info */
+  boot_info->RAMFS.address      = ramfs_addr;
 
   return boot_info;
 }

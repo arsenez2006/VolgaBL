@@ -110,9 +110,12 @@ bool         load_kernel(GPT_partition_entry const* partition, dword_t address);
  *
  * @param drive_GUID GUID of the booted drive
  * @param mem_map Memory map, returned by \ref get_memory_map
+ * @param ramfs_addr Physical address of RAMFS
  * @return Boot info object
  */
-boot_info_t* create_boot_info(byte_t const* drive_GUID, memory_map* mem_map);
+boot_info_t* create_boot_info(
+    byte_t const* drive_GUID, memory_map* mem_map, qword_t ramfs_addr
+);
 
 /**
  * @brief Checks if CPUID available
@@ -120,7 +123,7 @@ boot_info_t* create_boot_info(byte_t const* drive_GUID, memory_map* mem_map);
  * @return true - CPUID is available
  * @return false - CPUID is not available
  */
-bool         check_cpuid(void);
+bool check_cpuid(void);
 
 /**
  * @brief Checks CPU extensions
@@ -128,7 +131,7 @@ bool         check_cpuid(void);
  * @return true - all required extensions are present
  * @return false - some of the extensions are not implemented
  */
-bool         check_cpu_compat(void);
+bool check_cpu_compat(void);
 
 /* Leave this undocumented */
 #ifndef DOX_SKIP

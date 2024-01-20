@@ -229,7 +229,7 @@ void __noreturn ssl_entry(void) {
   }
 
   /* Create boot info */
-  if ((boot_info = create_boot_info(drive_GUID, mem_map)) == NULL) {
+  if ((boot_info = create_boot_info(drive_GUID, mem_map, 0x100000)) == NULL) {
     print_error("Failed to create boot info");
     goto halt;
   }

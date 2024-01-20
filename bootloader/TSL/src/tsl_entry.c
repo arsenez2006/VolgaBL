@@ -6,6 +6,7 @@
  */
 #include <bl/defines.h>
 #include <bl/io.h>
+#include <bl/ramfs.h>
 #include <bl/string.h>
 #include <bl/types.h>
 #include <bl/utils.h>
@@ -31,12 +32,29 @@ static void    print_error(char const* error_str) {
  */
 void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   size_t i;
+  void*  kernel_image;
+  size_t kernel_image_size;
 
   /* Verify boot info size */
   if (boot_info->size != sizeof(boot_info_t)) {
     print_error("Boot info is outdated");
     goto halt;
   }
+
+  /* Initialize RAMFS driver */
+  if (!ramfs_init((void*)(uintptr_t)boot_info->RAMFS.address)) {
+    print_error("Failed to initialize RAMFS");
+    goto halt;
+  }
+
+  /* Find kernel image */
+  if ((kernel_image = ramfs_file("ramfs/kernel.pe", &kernel_image_size)) ==
+      NULL) {
+    print_error("Cannot find ramfs/kernel.pe");
+    goto halt;
+  }
+
+  serial_printf("%p, %d\n", kernel_image, kernel_image_size);
 
   /* Enable Physical Address Extension */
   enable_PAE();

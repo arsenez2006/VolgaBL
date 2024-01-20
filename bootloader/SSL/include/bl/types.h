@@ -520,6 +520,18 @@ typedef struct __packed boot_info_t {
      */
     qword_t rsdp;
   } ACPI;
+
+  /**
+   * @brief RAMFS info
+   *
+   */
+  struct {
+    /**
+     * @brief Physical address of RAMFS
+     *
+     */
+    qword_t address;
+  } RAMFS;
 } boot_info_t;
 
 #endif /* BL_TYPES_H */

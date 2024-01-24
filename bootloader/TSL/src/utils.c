@@ -129,7 +129,7 @@ bool check_cpu_compat(void) {
 
   eax = 0x80000001;
   _cpuid(&eax, &ebx, &ecx, &edx);
-  if (!(edx & CPUID_LM) || !(edx & CPUID_PG1G)) {
+  if (!(edx & CPUID_LM)) {
     return false;
   }
 

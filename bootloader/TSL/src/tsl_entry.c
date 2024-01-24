@@ -14,6 +14,8 @@
 
 static qword_t pml4[512] __align(1 << 12);
 static qword_t pml3[512] __align(1 << 12);
+static qword_t pml2[512] __align(1 << 12);
+static qword_t pml1[512] __align(1 << 12);
 
 /**
  * @brief Print error message to screen
@@ -71,19 +73,29 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   /* Clear page tables */
   memset(pml4, 0, sizeof pml4);
   memset(pml3, 0, sizeof pml3);
+  memset(pml2, 0, sizeof pml2);
+  memset(pml1, 0, sizeof pml1);
 
-  /* Identity map first 4GB of RAM */
-  for (i = 0; i < 4; ++i) { pml3[i] = ((qword_t)i << 30) | 0x83; }
+  /*for (i = 0; i < 4; ++i) { pml3[i] = ((qword_t)i << 30) | 0x83; }
+  pml4[0] = (qword_t)(uintptr_t)pml3 | 0x3;*/
+
+  /* Identity map TSL */
+  for (i = 0; i < 16; ++i) {
+    qword_t addr     = 0x20000 + (i << 12);
+    pml1[addr >> 12] = addr | 0x3;
+  }
+
+  /* Identity map RAMFS and kernel image */
+  for (i = boot_info->RAMFS.address >> 12;
+       i < (qword_t)align_page((byte_t*)kernel.load_addr + kernel.image_size) >>
+       12;
+       ++i) {
+    pml1[i] = (i << 12) | 0x3;
+  }
+
+  pml2[0] = (qword_t)(uintptr_t)pml1 | 0x3;
+  pml3[0] = (qword_t)(uintptr_t)pml2 | 0x3;
   pml4[0] = (qword_t)(uintptr_t)pml3 | 0x3;
-
-  /* Load page table */
-  load_page_table(pml4);
-
-  /* Enable Long Mode */
-  enable_long_mode();
-
-  /* Enable Paging */
-  enable_paging();
 
   /* Find ACPI RSDP table*/
   for (i = 0xE0000; i < 0xFFFFF; ++i) {
@@ -95,6 +107,15 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
     print_error("Failed to find ACPI tables");
   }
   boot_info->ACPI.rsdp = i;
+
+  /* Load page table */
+  load_page_table(pml4);
+
+  /* Enable Long Mode */
+  enable_long_mode();
+
+  /* Enable Paging */
+  enable_paging();
 
 halt:
   while (1) { __asm__ volatile("hlt"); }

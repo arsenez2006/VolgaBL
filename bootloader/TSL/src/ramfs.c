@@ -5,7 +5,6 @@
  *
  */
 
-#include <bl/io.h>
 #include <bl/ramfs.h>
 #include <bl/string.h>
 

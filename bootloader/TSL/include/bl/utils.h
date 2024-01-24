@@ -112,4 +112,12 @@ void    enable_paging(void);
  */
 void    disable_pci(void);
 
+/**
+ * @brief Align address to Page alignment
+ *
+ * @param addr Address to align
+ * @return Aligned address
+ */
+void*   align_page(void* addr);
+
 #endif /* BL_UTILS_H */

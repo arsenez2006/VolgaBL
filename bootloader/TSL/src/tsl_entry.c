@@ -6,6 +6,7 @@
  */
 #include <bl/defines.h>
 #include <bl/io.h>
+#include <bl/pe.h>
 #include <bl/ramfs.h>
 #include <bl/string.h>
 #include <bl/types.h>
@@ -31,9 +32,10 @@ static void    print_error(char const* error_str) {
  *
  */
 void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
-  size_t i;
-  void*  kernel_image;
-  size_t kernel_image_size;
+  size_t        i;
+  void*         kernel_image;
+  size_t        kernel_image_size;
+  pe_load_state kernel;
 
   /* Verify boot info size */
   if (boot_info->size != sizeof(boot_info_t)) {
@@ -54,7 +56,14 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
     goto halt;
   }
 
-  serial_printf("%p, %d\n", kernel_image, kernel_image_size);
+  /* Disable all PCI devices */
+  disable_pci();
+
+  /* Load kernel image */
+  if (!pe_load(kernel_image, align_page(ramfs_get_end()), &kernel)) {
+    print_error("Failed to load kernel image");
+    goto halt;
+  }
 
   /* Enable Physical Address Extension */
   enable_PAE();
@@ -75,9 +84,6 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
 
   /* Enable Paging */
   enable_paging();
-
-  /* Disable all PCI devices */
-  disable_pci();
 
   /* Find ACPI RSDP table*/
   for (i = 0xE0000; i < 0xFFFFF; ++i) {

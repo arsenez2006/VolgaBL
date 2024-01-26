@@ -6,7 +6,7 @@
 
 typedef struct pe_load_state {
   dword_t load_addr;
-  size_t  image_size;
+  dword_t image_end;
   dword_t entry;
 } pe_load_state;
 

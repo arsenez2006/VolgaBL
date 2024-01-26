@@ -98,8 +98,8 @@ bool pe_load(void* pe_addr, void* load_addr, pe_load_state* state) {
   image_size = sections[i - 1].virtual_address + sections[i - 1].virtual_size;
 
   /* Fill Load state */
-  state->load_addr  = (dword_t)load_addr;
-  state->image_size = image_size;
+  state->load_addr = (dword_t)load_addr;
+  state->image_end = (dword_t)load_addr + image_size;
   state->entry =
       pe_hdr->optional_header.address_of_entry_point + (dword_t)load_addr;
 

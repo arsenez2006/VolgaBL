@@ -14,7 +14,7 @@
 
 /* GDT for Protected mode */
 static GDTR32       gdtr_pm;
-static GDT32_entry  gdt_pm[3];
+static GDT32_entry  gdt_pm[4];
 
 /* GUID of booted drive */
 static byte_t       drive_GUID[16];
@@ -118,8 +118,18 @@ void __noreturn ssl_entry(void) {
           GDT_ACCESS_WRITEABLE
   );
 
+  /* Long mode 64bit code segment descriptor */
+  set_GDT32_entry(
+      &gdt_pm[3],
+      0x00000000,
+      0xFFFFFFFF,
+      GDT_FLAG_GRANULARITY | GDT_FLAG_LONG,
+      GDT_ACCESS_PRESENT | GDT_ACCESS_DPL0 | GDT_ACCESS_SEGMENT |
+          GDT_ACCESS_EXECUTABLE | GDT_ACCESS_READABLE
+  );
+
   /* Fill Protected mode GDTR */
-  set_GDTR32(&gdtr_pm, gdt_pm, 3);
+  set_GDTR32(&gdtr_pm, gdt_pm, 4);
 
   /* Load Protected mode GDT */
   load_GDT32(gdtr_pm);

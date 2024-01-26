@@ -76,21 +76,23 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   memset(pml2, 0, sizeof pml2);
   memset(pml1, 0, sizeof pml1);
 
-  /*for (i = 0; i < 4; ++i) { pml3[i] = ((qword_t)i << 30) | 0x83; }
-  pml4[0] = (qword_t)(uintptr_t)pml3 | 0x3;*/
+  /* Identity map SSL */
+  for (i = 0; i < 16; ++i) {
+    qword_t addr     = 0x10000 + (i << 12);
+    pml1[addr >> 12] = addr | 0x1;
+  }
 
   /* Identity map TSL */
   for (i = 0; i < 16; ++i) {
     qword_t addr     = 0x20000 + (i << 12);
-    pml1[addr >> 12] = addr | 0x3;
+    pml1[addr >> 12] = addr | 0x1;
   }
 
   /* Identity map RAMFS and kernel image */
   for (i = boot_info->RAMFS.address >> 12;
-       i < (qword_t)align_page((byte_t*)kernel.load_addr + kernel.image_size) >>
-       12;
+       i < (qword_t)(uintptr_t)align_page((void*)kernel.image_end) >> 12;
        ++i) {
-    pml1[i] = (i << 12) | 0x3;
+    pml1[i] = (i << 12) | 0x1;
   }
 
   pml2[0] = (qword_t)(uintptr_t)pml1 | 0x3;
@@ -116,6 +118,15 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
 
   /* Enable Paging */
   enable_paging();
+
+  /* Finalize TSL */
+  __asm__ volatile(
+      "pushw %[segment]\n"
+      "pushl %[offset]\n"
+      "ljmp *(%%esp)"
+      :
+      : [segment] "rmN"((word_t)3 << 3), [offset] "rm"((dword_t)kernel.entry)
+  );
 
 halt:
   while (1) { __asm__ volatile("hlt"); }

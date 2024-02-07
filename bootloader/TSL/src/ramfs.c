@@ -56,7 +56,9 @@ void* ramfs_file(char const* name, size_t* size) {
   posix_header* hdr;
   for (hdr = _ctx.addr; memcmp("ustar", hdr->magic, 5) == 0; hdr = _next(hdr)) {
     if (memcmp(hdr->name, name, strlen(name)) == 0) {
-      *size = _str_oct_to_dec(hdr->size);
+      if (size != NULL) {
+        *size = _str_oct_to_dec(hdr->size);
+      }
       return hdr + 1;
     }
   }

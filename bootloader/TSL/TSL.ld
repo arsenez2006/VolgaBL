@@ -14,7 +14,7 @@ SECTIONS
     } > TSL_segment
     .rodata :
     {
-        *(.rodata)
+        *(.rodata*)
     } > TSL_segment
     .data :
     {

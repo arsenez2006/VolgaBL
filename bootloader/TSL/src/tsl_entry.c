@@ -34,10 +34,9 @@ static void    print_error(char const* error_str) {
  *
  */
 void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
-  size_t        i;
-  void*         kernel_image;
-  size_t        kernel_image_size;
-  pe_load_state kernel;
+  size_t         i;
+  pe_load_state* kernel;
+  void*          pe_memory_end;
 
   /* Verify boot info size */
   if (boot_info->size != sizeof(boot_info_t)) {
@@ -45,24 +44,23 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
     goto halt;
   }
 
+  /* Disable all PCI devices */
+  disable_pci();
+
   /* Initialize RAMFS driver */
   if (!ramfs_init((void*)(uintptr_t)boot_info->RAMFS.address)) {
     print_error("Failed to initialize RAMFS");
     goto halt;
   }
 
-  /* Find kernel image */
-  if ((kernel_image = ramfs_file("ramfs/kernel.pe", &kernel_image_size)) ==
-      NULL) {
-    print_error("Cannot find ramfs/kernel.pe");
+  /* Initialize PE loader */
+  if (!pe_loader_init(align_page(ramfs_get_end()))) {
+    print_error("Failed to initialize PE loader");
     goto halt;
   }
 
-  /* Disable all PCI devices */
-  disable_pci();
-
   /* Load kernel image */
-  if (!pe_load(kernel_image, align_page(ramfs_get_end()), &kernel)) {
+  if (!pe_load("ramfs/kernel.pe", &kernel)) {
     print_error("Failed to load kernel image");
     goto halt;
   }
@@ -89,8 +87,9 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   }
 
   /* Identity map RAMFS and kernel image */
+  pe_get_memory_range(NULL, &pe_memory_end);
   for (i = boot_info->RAMFS.address >> 12;
-       i < (qword_t)(uintptr_t)align_page((void*)kernel.image_end) >> 12;
+       i < (qword_t)(uintptr_t)align_page(pe_memory_end) >> 12;
        ++i) {
     pml1[i] = (i << 12) | 0x1;
   }
@@ -125,7 +124,7 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
       "pushl %[offset]\n"
       "ljmp *(%%esp)"
       :
-      : [segment] "rmN"((word_t)3 << 3), [offset] "rm"((dword_t)kernel.entry)
+      : [segment] "rmN"((word_t)3 << 3), [offset] "rm"((dword_t)kernel->entry)
   );
 
 halt:

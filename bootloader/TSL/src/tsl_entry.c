@@ -130,7 +130,7 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
       "movl %%esp, %%ebp\n"
 
       "movl %[tmp_stack], %%esp\n"
-      "mov %[bootinfo], %%ecx\n"
+      "movl %[bootinfo], %%ecx\n"
 
       "lcall *(%%ebp)"
       :

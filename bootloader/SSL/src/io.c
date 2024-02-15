@@ -356,14 +356,7 @@ static int _vsnprintf(
             false
         );
         index = _format_output(
-            write,
-            num_buffer,
-            max_size,
-            index,
-            num_buffer,
-            num_size,
-            flags,
-            width
+            write, buffer, max_size, index, num_buffer, num_size, flags, width
         );
 
         format++;

@@ -228,6 +228,4 @@ void disable_pci(void) {
   }
 }
 
-void* align_page(void* addr) {
-  return (void*)(((((uintptr_t)addr - 1) / 4096) * 4096) + 4096);
-}
+dword_t align_page(dword_t addr) { return (addr + 4095) & -4096; }

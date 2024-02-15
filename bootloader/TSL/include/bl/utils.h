@@ -118,6 +118,6 @@ void    disable_pci(void);
  * @param addr Address to align
  * @return Aligned address
  */
-void*   align_page(void* addr);
+dword_t align_page(dword_t addr);
 
 #endif /* BL_UTILS_H */

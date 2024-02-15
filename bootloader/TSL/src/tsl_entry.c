@@ -36,7 +36,7 @@ static void    print_error(char const* error_str) {
 void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   size_t         i;
   pe_load_state* kernel;
-  void*          pe_memory_end;
+  dword_t        pe_memory_end;
 
   /* Verify boot info size */
   if (boot_info->size != sizeof(boot_info_t)) {
@@ -54,7 +54,7 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   }
 
   /* Initialize PE loader */
-  if (!pe_loader_init(align_page(ramfs_get_end()))) {
+  if (!pe_loader_init((void*)align_page((dword_t)ramfs_get_end()))) {
     print_error("Failed to initialize PE loader");
     goto halt;
   }
@@ -88,10 +88,15 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
 
   /* Identity map RAMFS and kernel image */
   pe_get_memory_range(NULL, &pe_memory_end);
-  for (i = boot_info->RAMFS.address >> 12;
-       i < (qword_t)(uintptr_t)align_page(pe_memory_end) >> 12;
-       ++i) {
+  pe_memory_end = align_page(pe_memory_end);
+  for (i = boot_info->RAMFS.address >> 12; i < pe_memory_end >> 12; ++i) {
     pml1[i] = (i << 12) | 0x1;
+  }
+
+  /* Identity map temporary stack */
+  for (i = 0; i < align_page(kernel->stack_size) >> 12; ++i) {
+    qword_t addr     = pe_memory_end + (i << 12);
+    pml1[addr >> 12] = addr | 0x1;
   }
 
   pml2[0] = (qword_t)(uintptr_t)pml1 | 0x3;
@@ -122,9 +127,17 @@ void __stdcall __noreturn tsl_entry(boot_info_t* boot_info) {
   __asm__ volatile(
       "pushw %[segment]\n"
       "pushl %[offset]\n"
-      "ljmp *(%%esp)"
+      "movl %%esp, %%ebp\n"
+
+      "movl %[tmp_stack], %%esp\n"
+      "mov %[bootinfo], %%ecx\n"
+
+      "lcall *(%%ebp)"
       :
-      : [segment] "rmN"((word_t)3 << 3), [offset] "rm"((dword_t)kernel->entry)
+      : [segment] "rmN"((word_t)3 << 3),
+        [offset] "rm"((dword_t)kernel->entry),
+        [bootinfo] "rmN"((dword_t)boot_info),
+        [tmp_stack] "rmN"((dword_t)pe_memory_end + kernel->stack_size)
   );
 
 halt:

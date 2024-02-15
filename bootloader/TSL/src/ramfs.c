@@ -28,9 +28,7 @@ static size_t _str_oct_to_dec(char const* oct) {
   return ret;
 }
 
-static size_t _align512(size_t val) {
-  return val == 0 ? 0 : ((((int)val - 1) / 512) * 512) + 512;
-}
+static size_t        _align512(size_t val) { return (val + 511) & -512; }
 
 static posix_header* _next(posix_header* hdr) {
   return (posix_header*)((byte_t*)(hdr + 1) +

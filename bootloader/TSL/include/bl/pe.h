@@ -9,6 +9,7 @@ typedef struct pe_load_state {
   dword_t load_addr;
   dword_t image_size;
   dword_t entry;
+  dword_t stack_size;
 } pe_load_state;
 
 /**
@@ -26,7 +27,7 @@ bool pe_loader_init(void* start);
  * @param [out] begin Begin of memory range
  * @param [out] end End of memory range
  */
-void pe_get_memory_range(void** begin, void** end);
+void pe_get_memory_range(dword_t* begin, dword_t* end);
 
 /**
  * @brief Load PE into memory

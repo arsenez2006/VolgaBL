@@ -113,16 +113,16 @@ bool pe_loader_init(void* start) {
   return true;
 }
 
-void pe_get_memory_range(void** begin, void** end) {
+void pe_get_memory_range(dword_t* begin, dword_t* end) {
   size_t i;
 
   if (begin) {
-    *begin = (void*)_ctx.states[0].load_addr;
+    *begin = _ctx.states[0].load_addr;
   }
   if (end) {
     for (i = STATES_MAX - 1; i >= 0; --i) {
       if (_ctx.states[i].load_addr != 0) {
-        *end = (void*)(_ctx.states[i].load_addr + _ctx.states[i].image_size);
+        *end = _ctx.states[i].load_addr + _ctx.states[i].image_size;
         break;
       }
     }
@@ -200,6 +200,7 @@ bool pe_load(char const* filename, pe_load_state** state) {
   snprintf(ret->name, sizeof ret->name, "%s", filename);
   ret->image_size = (dword_t)pe_hdr->optional_header.size_of_image;
   ret->entry = ret->load_addr + pe_hdr->optional_header.address_of_entry_point;
+  ret->stack_size = pe_hdr->optional_header.size_of_stack_commit;
 
   if (ret + 1 - &_ctx.states[0] < STATES_MAX) {
     (ret + 1)->load_addr = ret->load_addr + ret->image_size;

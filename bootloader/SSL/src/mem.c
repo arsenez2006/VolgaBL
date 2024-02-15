@@ -33,9 +33,7 @@ typedef struct __align(16) _block_hdr {
 
 _block_hdr;
 
-static size_t __inline__ _align16(size_t val) {
-  return ((((uintptr_t)val - 1) / 16) * 16) + 16;
-}
+static size_t __inline__ _align16(size_t val) { return (val + 15) & -16; }
 
 static void _allocate_block(_block_hdr* after, size_t size) {
   _block_hdr* new_block =

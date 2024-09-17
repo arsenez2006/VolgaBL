@@ -11,6 +11,7 @@ SECTIONS
   {
     *(.text)
     *(.data)
+    *(.rodata)
   } > code
   /DISCARD/ :
   {

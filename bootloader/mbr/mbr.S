@@ -1,3 +1,4 @@
+#include <version.h>
 .code16
 .globl _entry
 
@@ -14,14 +15,20 @@ _entry:
 
   /* Relocate to lower address */
   movw $0x0100, %cx
-  movw $0x7C00, %si
-  movw $0x1000, %di
+  movw %sp, %si
+  movw $_entry, %di
   rep movsw
 
   /* Jump to relocated code */
-  ljmp $0x0, $_relocated/* FIXME: Why the fuck ld segfaults when I put $_relocated here??? */
-_relocated:
+  ljmp $0x0000, $.Lrelocated 
+.Lrelocated:
   sti
-.halt:
+
+.Lhalt:
   hlt
-  jmp .halt
+  jmp .Lhalt
+
+.section .rodata
+greet: .ascii "Loading VolgaBL "
+version: .ascii VERSION
+greet_end: .asciz "... "

@@ -29,5 +29,5 @@ bl_version = meson.project_version()
 # Import common library
 subdir('bootloader/common')
 
-# Import MBR
-subdir('bootloader/mbr')
+# Import isoboot
+subdir('bootloader/isoboot')

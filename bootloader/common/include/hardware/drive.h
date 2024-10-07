@@ -1,4 +1,0 @@
-#ifndef COMMON_HARDWARE_DRIVE_H
-#define COMMON_HARDWARE_DRIVE_H
-
-#endif

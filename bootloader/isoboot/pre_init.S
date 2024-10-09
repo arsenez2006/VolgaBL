@@ -33,20 +33,55 @@ _pre_init:
 
   /* Print greet message */
   movw $greet, %si
-  xorb %bh, %bh
-  movb $0x0E, %ah
-.Lgreet_loop:
-  lodsb
-  orb %al, %al
-  jz .Lhalt
-  int $0x10
-  jmp .Lgreet_loop
+  call _print_msg
+
+  movw $0xDEAD, %ax
+  call _error
 .Lhalt:
   hlt
   jmp .Lhalt
+
+/* Prints message from SI */
+_print_msg:
+  pushaw
+  xorb %bh, %bh
+  movb $0x0E, %ah
+.Lprint_loop:
+  lodsb
+  orb %al, %al
+  jz .Lprint_done
+  int $0x10
+  jmp .Lprint_loop
+.Lprint_done:
+  popaw
+  ret
+
+/* Prints error message with error code from AX and halt processor */
+_error:
+  movw %ax, %dx
+  movw $error_msg, %si
+  call _print_msg
+  movw $4, %cx
+  movb $0x0E, %ah
+.Lnum_loop:
+  movb %dh, %bl
+  shrb $4, %bl
+  movb hex_alphabet(%bx), %al
+  int $0x10
+  shlw $4, %dx
+  loop .Lnum_loop
+.Lehalt:
+  hlt
+  jmp .Lehalt
 
 .section .rodata.pre
 greet:
 .ascii "Loading VolgaBL "
 .ascii VERSION
 .asciz "...\r\n"
+
+error_msg:
+.asciz "ISOBOOT PRE error: 0x"
+
+hex_alphabet:
+.ascii "0123456789ABCDEF"

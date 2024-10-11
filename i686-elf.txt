@@ -1,0 +1,9 @@
+[binaries]
+c = 'i686-elf-gcc'
+strip = 'i686-elf-strip'
+
+[host_machine]
+system = 'bios'
+cpu_family = 'i686'
+cpu = 'i686'
+endian = 'little'

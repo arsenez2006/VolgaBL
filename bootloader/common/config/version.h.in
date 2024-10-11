@@ -1,0 +1,6 @@
+#ifndef COMMON_VERSION_H
+#define COMMON_VERSION_H
+
+#define VERSION "@version@"
+
+#endif

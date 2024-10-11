@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Reconfigure preoject
+meson setup --reconfigure build
